@@ -15,10 +15,13 @@ function createToken(user) {
 }
 
 router.post('/register', (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password, role, consent } = req.body;
 
   if (!name || !email || !password) {
     return res.status(400).json({ error: 'Name, email and password are required' });
+  }
+  if (consent !== true) {
+    return res.status(400).json({ error: 'You must agree to the use of your data to create an account' });
   }
 
   const cleanName = name.trim();
@@ -33,7 +36,7 @@ router.post('/register', (req, res) => {
   // Passwords are never stored as plain text
   const passwordHash = bcrypt.hashSync(password, 10);
   const result = db
-    .prepare('INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)')
+    .prepare("INSERT INTO users (name, email, password_hash, role, consent_at) VALUES (?, ?, ?, ?, datetime('now'))")
     .run(cleanName, cleanEmail, passwordHash, userRole);
   db.prepare('INSERT INTO profiles (user_id) VALUES (?)').run(result.lastInsertRowid);
 
