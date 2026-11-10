@@ -66,4 +66,18 @@ router.get('/me', requireAuth, (req, res) => {
   res.json({ user: req.user });
 });
 
+// Lets a user delete their account. Their profile, skills, connections
+// and team memberships are removed with it.
+router.delete('/me', requireAuth, (req, res) => {
+  const { password } = req.body;
+  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id);
+
+  if (!password || !bcrypt.compareSync(password, user.password_hash)) {
+    return res.status(401).json({ error: 'Password is incorrect' });
+  }
+
+  db.prepare('DELETE FROM users WHERE id = ?').run(user.id);
+  res.json({ message: 'Your account and data have been deleted' });
+});
+
 module.exports = router;
