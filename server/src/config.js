@@ -4,4 +4,5 @@ const path = require('path');
 module.exports = {
   port: process.env.PORT || 4000,
   dbFile: process.env.DB_FILE || path.join(__dirname, '..', 'youthlink.db'),
+  jwtSecret: process.env.JWT_SECRET || 'dev-secret-change-in-production',
 };
