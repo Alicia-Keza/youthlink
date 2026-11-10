@@ -29,6 +29,22 @@ describe('Registration and login (FR1)', () => {
     expect(res.status).toBe(400);
   });
 
+  test('rejects an invalid email address', async () => {
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({ name: 'Bad Email', email: 'not-an-email', password: 'password123', consent: true });
+
+    expect(res.status).toBe(400);
+  });
+
+  test('rejects a password shorter than 8 characters', async () => {
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({ name: 'Short', email: 'short@example.com', password: '1234', consent: true });
+
+    expect(res.status).toBe(400);
+  });
+
   test('stores the password as a hash (NFR1)', () => {
     const row = db.prepare('SELECT password_hash FROM users WHERE email = ?').get('alice@example.com');
     expect(row.password_hash).not.toBe('password123');

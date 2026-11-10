@@ -20,6 +20,12 @@ router.post('/register', (req, res) => {
   if (!name || !email || !password) {
     return res.status(400).json({ error: 'Name, email and password are required' });
   }
+  if (!/^\S+@\S+\.\S+$/.test(email)) {
+    return res.status(400).json({ error: 'Please enter a valid email address' });
+  }
+  if (password.length < 8) {
+    return res.status(400).json({ error: 'Password must be at least 8 characters' });
+  }
   if (consent !== true) {
     return res.status(400).json({ error: 'You must agree to the use of your data to create an account' });
   }
