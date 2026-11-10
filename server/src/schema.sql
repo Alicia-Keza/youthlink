@@ -1,0 +1,49 @@
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'youth' CHECK (role IN ('youth', 'mentor', 'investor', 'admin')),
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- One profile per user. It is deleted together with the user.
+CREATE TABLE IF NOT EXISTS profiles (
+  user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  bio TEXT NOT NULL DEFAULT '',
+  education TEXT NOT NULL DEFAULT '',
+  location TEXT NOT NULL DEFAULT '',
+  interests TEXT NOT NULL DEFAULT '',
+  looking_for TEXT NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS skills (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  category TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS connections (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  requester_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  receiver_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'declined')),
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- A team stays even if the user who created it deletes their account.
+CREATE TABLE IF NOT EXISTS teams (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS team_members (
+  team_id INTEGER NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  joined_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (team_id, user_id)
+);
