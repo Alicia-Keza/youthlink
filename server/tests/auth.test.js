@@ -43,6 +43,14 @@ describe('Registration and login (FR1)', () => {
     expect(res.body.token).toBeDefined();
   });
 
+  test('logs in when the email is typed with capital letters', async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'Alice@Example.com', password: 'password123' });
+
+    expect(res.status).toBe(200);
+  });
+
   test('rejects a wrong password', async () => {
     const res = await request(app)
       .post('/api/auth/login')
