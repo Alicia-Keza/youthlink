@@ -67,4 +67,21 @@ router.post('/', (req, res) => {
   res.status(201).json({ connection: { id: result.lastInsertRowid, status: 'pending' } });
 });
 
+// Only the person who received a request can answer it
+function answerRequest(status) {
+  return (req, res) => {
+    const result = db
+      .prepare("UPDATE connections SET status = ? WHERE id = ? AND receiver_id = ? AND status = 'pending'")
+      .run(status, req.params.id, req.user.id);
+
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Connection request not found' });
+    }
+    res.json({ connection: { id: Number(req.params.id), status } });
+  };
+}
+
+router.put('/:id/accept', answerRequest('accepted'));
+router.put('/:id/decline', answerRequest('declined'));
+
 module.exports = router;
