@@ -37,6 +37,42 @@ router.put('/me', (req, res) => {
   res.json({ profile: getProfile(req.user.id) });
 });
 
+router.post('/me/skills', (req, res) => {
+  const name = String(req.body.name || '').trim();
+  const { category } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ error: 'Skill name is required' });
+  }
+  if (!SKILL_CATEGORIES.includes(category)) {
+    return res.status(400).json({ error: 'Please choose a valid skill category' });
+  }
+
+  const existing = db
+    .prepare('SELECT id FROM skills WHERE user_id = ? AND lower(name) = lower(?)')
+    .get(req.user.id, name);
+  if (existing) {
+    return res.status(409).json({ error: 'You have already added this skill' });
+  }
+
+  const result = db
+    .prepare('INSERT INTO skills (user_id, name, category) VALUES (?, ?, ?)')
+    .run(req.user.id, name, category);
+
+  res.status(201).json({ skill: { id: result.lastInsertRowid, name, category } });
+});
+
+router.delete('/me/skills/:id', (req, res) => {
+  const result = db
+    .prepare('DELETE FROM skills WHERE id = ?')
+    .run(req.params.id);
+
+  if (result.changes === 0) {
+    return res.status(404).json({ error: 'Skill not found' });
+  }
+  res.json({ message: 'Skill removed' });
+});
+
 router.get('/:userId', (req, res) => {
   const profile = getProfile(req.params.userId);
   if (!profile) {
