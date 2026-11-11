@@ -13,6 +13,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/profile', require('./routes/profile'));
 app.use('/api/matches', require('./routes/matches'));
+app.use('/api/connections', require('./routes/connections'));
 
 // Any other route
 app.use((req, res) => {
