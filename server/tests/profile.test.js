@@ -100,4 +100,14 @@ describe('Profile and skills (FR2)', () => {
     const after = await request(app).get('/api/profile/me').set(auth(alice));
     expect(after.body.profile.skills).toEqual([]);
   });
+
+  test('a user cannot remove the skill of someone else', async () => {
+    const added = await request(app)
+      .post('/api/profile/me/skills')
+      .set(auth(alice))
+      .send({ name: 'React', category: 'Technology' });
+
+    const res = await request(app).delete(`/api/profile/me/skills/${added.body.skill.id}`).set(auth(brian));
+    expect(res.status).toBe(404);
+  });
 });

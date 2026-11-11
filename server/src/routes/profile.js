@@ -64,8 +64,8 @@ router.post('/me/skills', (req, res) => {
 
 router.delete('/me/skills/:id', (req, res) => {
   const result = db
-    .prepare('DELETE FROM skills WHERE id = ?')
-    .run(req.params.id);
+    .prepare('DELETE FROM skills WHERE id = ? AND user_id = ?')
+    .run(req.params.id, req.user.id);
 
   if (result.changes === 0) {
     return res.status(404).json({ error: 'Skill not found' });
