@@ -85,6 +85,16 @@ describe('Matches API (FR3)', () => {
     expect(finance.body.matches).toHaveLength(0);
   });
 
+  test('shows the connection status of each match', async () => {
+    const before = await request(app).get('/api/matches').set(auth(developer));
+    expect(before.body.matches[0].connectionStatus).toBe('none');
+
+    await request(app).post('/api/connections').set(auth(developer)).send({ userId: marketer.id });
+
+    const sent = await request(app).get('/api/matches').set(auth(developer));
+    expect(sent.body.matches[0].connectionStatus).toBe('request_sent');
+  });
+
   test('needs a login', async () => {
     const res = await request(app).get('/api/matches');
     expect(res.status).toBe(401);

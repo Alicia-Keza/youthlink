@@ -3,6 +3,7 @@ const db = require('../db');
 const requireAuth = require('../middleware/auth');
 const { getProfile } = require('../profiles');
 const { findMatches } = require('../matching');
+const { connectionStatus } = require('../connectionHelpers');
 
 const router = express.Router();
 
@@ -32,6 +33,11 @@ router.get('/', requireAuth, (req, res) => {
       return text.toLowerCase().includes(search);
     });
   }
+
+  matches = matches.map((match) => ({
+    ...match,
+    connectionStatus: connectionStatus(req.user.id, match.user.id),
+  }));
 
   res.json({ matches });
 });

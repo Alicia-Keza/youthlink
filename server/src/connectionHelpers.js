@@ -15,4 +15,12 @@ function areConnected(userA, userB) {
   return Boolean(connection && connection.status === 'accepted');
 }
 
-module.exports = { findConnection, areConnected };
+// Describes the connection from the point of view of userId.
+function connectionStatus(userId, otherId) {
+  const connection = findConnection(userId, otherId);
+  if (!connection || connection.status === 'declined') return 'none';
+  if (connection.status === 'accepted') return 'connected';
+  return connection.requester_id === userId ? 'request_sent' : 'request_received';
+}
+
+module.exports = { findConnection, areConnected, connectionStatus };
