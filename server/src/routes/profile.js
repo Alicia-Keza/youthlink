@@ -1,0 +1,84 @@
+const express = require('express');
+const db = require('../db');
+const requireAuth = require('../middleware/auth');
+const SKILL_CATEGORIES = require('../skillCategories');
+const { toList, toText } = require('../lists');
+const { getProfile } = require('../profiles');
+
+const router = express.Router();
+router.use(requireAuth);
+
+router.get('/me', (req, res) => {
+  res.json({ profile: getProfile(req.user.id) });
+});
+
+router.put('/me', (req, res) => {
+  const { bio = '', education = '', location = '', interests = [], lookingFor = [] } = req.body;
+
+  if (String(bio).length > 500) {
+    return res.status(400).json({ error: 'Bio must be 500 characters or less' });
+  }
+
+  // Only known skill areas can be saved as "looking for"
+  const wanted = toList(lookingFor).filter((category) => SKILL_CATEGORIES.includes(category));
+
+  db.prepare(
+    `UPDATE profiles SET bio = ?, education = ?, location = ?, interests = ?, looking_for = ?
+     WHERE user_id = ?`
+  ).run(
+    String(bio).trim(),
+    String(education).trim(),
+    String(location).trim(),
+    toText(interests),
+    toText(wanted),
+    req.user.id
+  );
+
+  res.json({ profile: getProfile(req.user.id) });
+});
+
+router.post('/me/skills', (req, res) => {
+  const name = String(req.body.name || '').trim();
+  const { category } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ error: 'Skill name is required' });
+  }
+  if (!SKILL_CATEGORIES.includes(category)) {
+    return res.status(400).json({ error: 'Please choose a valid skill category' });
+  }
+
+  const existing = db
+    .prepare('SELECT id FROM skills WHERE user_id = ? AND lower(name) = lower(?)')
+    .get(req.user.id, name);
+  if (existing) {
+    return res.status(409).json({ error: 'You have already added this skill' });
+  }
+
+  const result = db
+    .prepare('INSERT INTO skills (user_id, name, category) VALUES (?, ?, ?)')
+    .run(req.user.id, name, category);
+
+  res.status(201).json({ skill: { id: result.lastInsertRowid, name, category } });
+});
+
+router.delete('/me/skills/:id', (req, res) => {
+  const result = db
+    .prepare('DELETE FROM skills WHERE id = ? AND user_id = ?')
+    .run(req.params.id, req.user.id);
+
+  if (result.changes === 0) {
+    return res.status(404).json({ error: 'Skill not found' });
+  }
+  res.json({ message: 'Skill removed' });
+});
+
+router.get('/:userId', (req, res) => {
+  const profile = getProfile(req.params.userId);
+  if (!profile) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+  res.json({ profile });
+});
+
+module.exports = router;
