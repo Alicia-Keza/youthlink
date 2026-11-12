@@ -17,4 +17,10 @@ function auth(user) {
   return { Authorization: `Bearer ${user.token}` };
 }
 
-module.exports = { request, app, createUser, auth };
+// Makes two users connected: one sends a request and the other accepts it
+async function connect(sender, receiver) {
+  const res = await request(app).post('/api/connections').set(auth(sender)).send({ userId: receiver.id });
+  await request(app).put(`/api/connections/${res.body.connection.id}/accept`).set(auth(receiver));
+}
+
+module.exports = { request, app, createUser, auth, connect };
