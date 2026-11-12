@@ -1,14 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
-
-function Home() {
-  return (
-    <section>
-      <h1>YouthLink</h1>
-      <p>Transforming ideas into real businesses through youth collaboration.</p>
-    </section>
-  );
-}
+import Landing from './pages/Landing';
 
 export default function App() {
   return (
@@ -16,7 +8,7 @@ export default function App() {
       <Navbar />
       <main className="container">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Landing />} />
           <Route path="*" element={<p>Page not found.</p>} />
         </Routes>
       </main>
