@@ -35,6 +35,11 @@ describe('Connection requests (FR4)', () => {
     expect(same.status).toBe(409);
   });
 
+  test('cannot send a request to someone who already sent you one', async () => {
+    const reverse = await request(app).post('/api/connections').set(auth(brian)).send({ userId: alice.id });
+    expect(reverse.status).toBe(409);
+  });
+
   test('the request shows as outgoing for the sender and incoming for the receiver', async () => {
     const sender = await request(app).get('/api/connections').set(auth(alice));
     expect(sender.body.outgoing).toHaveLength(1);

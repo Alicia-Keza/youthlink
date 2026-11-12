@@ -1,13 +1,13 @@
 const db = require('./db');
 
-// Finds the connection between two users.
+// Finds the connection between two users, whoever sent the request.
 function findConnection(userA, userB) {
   return db
     .prepare(
       `SELECT * FROM connections
-       WHERE requester_id = ? AND receiver_id = ?`
+       WHERE (requester_id = ? AND receiver_id = ?) OR (requester_id = ? AND receiver_id = ?)`
     )
-    .get(userA, userB);
+    .get(userA, userB, userB, userA);
 }
 
 function areConnected(userA, userB) {

@@ -93,6 +93,9 @@ describe('Matches API (FR3)', () => {
 
     const sent = await request(app).get('/api/matches').set(auth(developer));
     expect(sent.body.matches[0].connectionStatus).toBe('request_sent');
+
+    const received = await request(app).get('/api/matches').set(auth(marketer));
+    expect(received.body.matches[0].connectionStatus).toBe('request_received');
   });
 
   test('needs a login', async () => {
