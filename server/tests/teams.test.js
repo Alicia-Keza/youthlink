@@ -94,6 +94,16 @@ describe('Team formation (FR5)', () => {
     expect(teams.body.teams).toHaveLength(0);
   });
 
+  test('choosing the same person twice does not cause an error', async () => {
+    const res = await request(app)
+      .post('/api/teams')
+      .set(auth(alice))
+      .send({ name: 'Duplicates', memberIds: [brian.id, brian.id] });
+
+    expect(res.status).toBe(201);
+    expect(res.body.team.members).toHaveLength(2);
+  });
+
   test('a member who deletes their account is removed from the team', async () => {
     await request(app).delete('/api/auth/me').set(auth(brian)).send({ password: 'password123' });
 

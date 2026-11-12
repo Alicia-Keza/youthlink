@@ -43,7 +43,8 @@ router.post('/', (req, res) => {
     return res.status(400).json({ error: 'Choose at least one connection to form a team' });
   }
 
-  const ids = memberIds.map(Number);
+  // Remove repeated ids so nobody is added to the team twice
+  const ids = [...new Set(memberIds.map(Number))];
   for (const id of ids) {
     if (!areConnected(req.user.id, id)) {
       return res.status(400).json({ error: 'You can only form a team with people you are connected with' });
