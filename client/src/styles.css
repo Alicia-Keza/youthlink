@@ -301,6 +301,13 @@ fieldset {
   color: var(--primary);
 }
 
+.tag-with-remove {
+  display: inline-flex;
+  gap: 0.3rem;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
 /* Small screens */
 @media (max-width: 600px) {
   h1 {
