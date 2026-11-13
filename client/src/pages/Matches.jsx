@@ -1,21 +1,34 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api';
+import { SKILL_CATEGORIES } from '../constants';
 import SkillTag from '../components/SkillTag';
 
 export default function Matches() {
   const [matches, setMatches] = useState([]);
+  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   function loadMatches() {
-    api('/matches')
+    const params = new URLSearchParams();
+    if (search) params.set('search', search);
+    if (category) params.set('category', category);
+
+    api(`/matches?${params}`)
       .then((data) => setMatches(data.matches))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }
 
-  useEffect(loadMatches, []);
+  // Load again when the skill area filter changes
+  useEffect(loadMatches, [category]);
+
+  function handleSearch(e) {
+    e.preventDefault();
+    loadMatches();
+  }
 
   async function connect(userId) {
     setError('');
@@ -49,6 +62,21 @@ export default function Matches() {
       <h1>Matches</h1>
       <p className="muted">People whose skills complement yours, best match first.</p>
       {error && <p className="error">{error}</p>}
+
+      <form className="row" onSubmit={handleSearch}>
+        <input
+          placeholder="Search by name, skill or interest"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <select value={category} onChange={(e) => setCategory(e.target.value)} aria-label="Filter by skill area">
+          <option value="">All skill areas</option>
+          {SKILL_CATEGORIES.map((item) => (
+            <option key={item}>{item}</option>
+          ))}
+        </select>
+        <button className="button secondary" type="submit">Search</button>
+      </form>
 
       {loading && <p className="muted">Loading...</p>}
       {!loading && matches.length === 0 && (
