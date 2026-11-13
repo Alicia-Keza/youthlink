@@ -329,6 +329,29 @@ fieldset {
   border-bottom: none;
 }
 
+/* Team skill coverage */
+.coverage {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.coverage-item {
+  padding: 0.2rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.coverage-item.covered {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.coverage-item.missing {
+  background: #f3f4f6;
+  color: var(--muted);
+}
+
 /* Small screens */
 @media (max-width: 600px) {
   h1 {
