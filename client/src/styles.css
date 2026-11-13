@@ -355,6 +355,10 @@ fieldset {
   color: var(--muted);
 }
 
+.danger-zone {
+  border-color: #fca5a5;
+}
+
 /* Small screens */
 @media (max-width: 600px) {
   h1 {

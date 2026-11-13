@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../api';
+import { useAuth } from '../AuthContext';
 import { SKILL_CATEGORIES } from '../constants';
 import SkillTag from '../components/SkillTag';
 
 export default function Profile() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
   const [form, setForm] = useState({ bio: '', education: '', location: '', interests: '', lookingFor: [] });
   const [skills, setSkills] = useState([]);
   const [newSkill, setNewSkill] = useState({ name: '', category: SKILL_CATEGORIES[0] });
+  const [deletePassword, setDeletePassword] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
@@ -68,6 +73,21 @@ export default function Profile() {
     try {
       await api(`/profile/me/skills/${skillId}`, { method: 'DELETE' });
       setSkills(skills.filter((skill) => skill.id !== skillId));
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  async function deleteAccount(e) {
+    e.preventDefault();
+    setError('');
+    if (!window.confirm('This will permanently delete your account and all your data. Continue?')) {
+      return;
+    }
+    try {
+      await api('/auth/me', { method: 'DELETE', body: { password: deletePassword } });
+      logout();
+      navigate('/');
     } catch (err) {
       setError(err.message);
     }
@@ -146,6 +166,18 @@ export default function Profile() {
         </fieldset>
 
         <button className="button" type="submit">Save profile</button>
+      </form>
+
+      <form className="card form danger-zone" onSubmit={deleteAccount}>
+        <h2>Delete my account</h2>
+        <p className="muted">
+          This removes your account, profile, skills, connections and team memberships. It cannot be undone.
+        </p>
+        <label>
+          Enter your password to confirm
+          <input type="password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} required />
+        </label>
+        <button className="button danger" type="submit">Delete my account</button>
       </form>
     </div>
   );
