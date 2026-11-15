@@ -70,4 +70,50 @@ router.get('/:id', (req, res) => {
   res.json({ project: { ...project, canEdit: isMember(project.teamId, req.user.id) } });
 });
 
+// Finds the project and checks that the logged in user is in its team.
+// Sends the error response and returns null when the user cannot edit it.
+function findEditableProject(req, res) {
+  const project = getProject(req.params.id);
+  if (!project) {
+    res.status(404).json({ error: 'Project not found' });
+    return null;
+  }
+  if (!isMember(project.teamId, req.user.id)) {
+    res.status(403).json({ error: 'Only team members can change this project' });
+    return null;
+  }
+  return project;
+}
+
+router.put('/:id', (req, res) => {
+  const project = findEditableProject(req, res);
+  if (!project) return;
+
+  const title = String(req.body.title || '').trim();
+  const description = String(req.body.description || '').trim();
+  if (!title) {
+    return res.status(400).json({ error: 'Project title is required' });
+  }
+
+  db.prepare("UPDATE projects SET title = ?, description = ?, updated_at = datetime('now') WHERE id = ?").run(
+    title,
+    description,
+    project.id
+  );
+  res.json({ project: getProject(project.id) });
+});
+
+router.put('/:id/stage', (req, res) => {
+  const project = findEditableProject(req, res);
+  if (!project) return;
+
+  const { stage } = req.body;
+  if (!PROJECT_STAGES.includes(stage)) {
+    return res.status(400).json({ error: 'Please choose a valid project stage' });
+  }
+
+  db.prepare("UPDATE projects SET stage = ?, updated_at = datetime('now') WHERE id = ?").run(stage, project.id);
+  res.json({ project: getProject(project.id) });
+});
+
 module.exports = router;
