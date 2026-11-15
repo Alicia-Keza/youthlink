@@ -15,6 +15,7 @@ app.use('/api/profile', require('./routes/profile'));
 app.use('/api/matches', require('./routes/matches'));
 app.use('/api/connections', require('./routes/connections'));
 app.use('/api/teams', require('./routes/teams'));
+app.use('/api/projects', require('./routes/projects'));
 
 // Any other route
 app.use((req, res) => {
