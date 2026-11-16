@@ -359,6 +359,15 @@ fieldset {
   border-color: #fca5a5;
 }
 
+/* Project stage label */
+.stage {
+  padding: 0.15rem 0.6rem;
+  border-radius: 6px;
+  background: #e0f2fe;
+  color: #075985;
+  font-size: 0.85rem;
+}
+
 /* Small screens */
 @media (max-width: 600px) {
   h1 {

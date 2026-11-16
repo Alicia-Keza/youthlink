@@ -9,14 +9,16 @@ export default function TeamDetail() {
   const navigate = useNavigate();
   const [team, setTeam] = useState(null);
   const [connections, setConnections] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [newMemberId, setNewMemberId] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
-    Promise.all([api(`/teams/${id}`), api('/connections')])
-      .then(([teamData, connectionData]) => {
+    Promise.all([api(`/teams/${id}`), api('/connections'), api(`/projects?teamId=${id}`)])
+      .then(([teamData, connectionData, projectData]) => {
         setTeam(teamData.team);
         setConnections(connectionData.connected.map((item) => item.user));
+        setProjects(projectData.projects);
       })
       .catch((err) => setError(err.message));
   }, [id]);
@@ -109,6 +111,20 @@ export default function TeamDetail() {
             <button className="button" type="submit">Add to team</button>
           </form>
         )}
+      </section>
+
+      <section className="card">
+        <h2>Projects</h2>
+        {projects.length === 0 && <p className="muted">This team has no projects yet.</p>}
+        <ul className="list">
+          {projects.map((project) => (
+            <li key={project.id}>
+              <Link to={`/projects/${project.id}`}>{project.title}</Link>
+              <span className="stage">{project.stage}</span>
+            </li>
+          ))}
+        </ul>
+        <Link to={`/teams/${id}/projects/new`} className="button">Start a project</Link>
       </section>
 
       <button className="button danger" onClick={leaveTeam}>Leave team</button>

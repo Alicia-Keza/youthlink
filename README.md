@@ -19,7 +19,7 @@ Create Account → Create Profile → Add Skills and Ideas → Discover Matches 
 | Skill-based matching | FR3 | Done |
 | Connection requests | FR4 | Done |
 | Team formation | FR5 | Done |
-| Project management | FR6 | Planned (Sprint 3) |
+| Project management | FR6 | Done |
 | Mentorship | FR7 | Planned (Sprint 3) |
 | In-app messaging | FR8 | Planned (Sprint 4) |
 | Notifications | FR9 | Planned (Sprint 4) |
@@ -127,6 +127,15 @@ All routes except register and login need the header `Authorization: Bearer <tok
 | GET | `/api/teams/:id` | Team details and members |
 | POST | `/api/teams/:id/members` | Add a connected user to the team |
 | DELETE | `/api/teams/:id/members/me` | Leave the team |
+| GET | `/api/projects` | Browse all projects (`stage` and `teamId` are optional) |
+| POST | `/api/projects` | Create a project for one of my teams |
+| GET | `/api/projects/:id` | Project details |
+| PUT | `/api/projects/:id` | Edit the title and description (team members only) |
+| PUT | `/api/projects/:id/stage` | Update the stage (team members only) |
+| POST | `/api/projects/:id/interest` | Show interest in investing (investors only) |
+| DELETE | `/api/projects/:id/interest` | Remove my interest |
+
+Project stages are Idea, Planning, In development and Launched.
 
 ## Project structure
 
@@ -141,6 +150,6 @@ server/   Express API, database schema and tests
 |---|---|---|
 | 1 | Planning and design (SRS and UML diagrams) | Done |
 | 2 | Core platform: accounts, profiles, matching, connections, teams | Done |
-| 3 | Projects and mentorship | Todo |
+| 3 | Projects and mentorship | In progress |
 | 4 | Messaging, notifications and admin | Todo |
 | 5 | Testing, deployment and handover | Todo |

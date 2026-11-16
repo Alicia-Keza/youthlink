@@ -3,6 +3,7 @@ const db = require('../db');
 const requireAuth = require('../middleware/auth');
 const { areConnected } = require('../connectionHelpers');
 const { getSkills } = require('../profiles');
+const { isMember } = require('../teamHelpers');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -23,11 +24,6 @@ function getTeam(teamId) {
 
   team.members = members.map((member) => ({ ...member, skills: getSkills(member.id) }));
   return team;
-}
-
-function isMember(teamId, userId) {
-  const row = db.prepare('SELECT 1 FROM team_members WHERE team_id = ? AND user_id = ?').get(teamId, userId);
-  return Boolean(row);
 }
 
 // Creates a team with the logged in user and the chosen connections
