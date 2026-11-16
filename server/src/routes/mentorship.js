@@ -67,4 +67,41 @@ router.get('/team/:teamId', (req, res) => {
   res.json({ requests });
 });
 
+// For the mentor dashboard: requests waiting for an answer and the teams being mentored
+router.get('/requests', (req, res) => {
+  const rows = db
+    .prepare(
+      `SELECT r.id, r.status, r.message, r.created_at AS createdAt, t.id AS teamId, t.name AS teamName
+       FROM mentorship_requests r JOIN teams t ON t.id = r.team_id
+       WHERE r.mentor_id = ? AND r.status != 'declined' ORDER BY r.id DESC`
+    )
+    .all(req.user.id);
+
+  // Show the projects of each team so the mentor can open them and give feedback
+  const projectsOfTeam = db.prepare('SELECT id, title, stage FROM projects WHERE team_id = ? ORDER BY id DESC');
+  const requests = rows.map((row) => ({ ...row, projects: projectsOfTeam.all(row.teamId) }));
+
+  res.json({
+    pending: requests.filter((request) => request.status === 'pending'),
+    accepted: requests.filter((request) => request.status === 'accepted'),
+  });
+});
+
+// Only the mentor who received a request can answer it
+function answerRequest(status) {
+  return (req, res) => {
+    const result = db
+      .prepare("UPDATE mentorship_requests SET status = ? WHERE id = ? AND mentor_id = ? AND status = 'pending'")
+      .run(status, req.params.id, req.user.id);
+
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Mentorship request not found' });
+    }
+    res.json({ request: { id: Number(req.params.id), status } });
+  };
+}
+
+router.put('/:id/accept', answerRequest('accepted'));
+router.put('/:id/decline', answerRequest('declined'));
+
 module.exports = router;
