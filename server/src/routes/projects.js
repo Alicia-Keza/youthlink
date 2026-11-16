@@ -66,8 +66,51 @@ router.get('/:id', (req, res) => {
   if (!project) {
     return res.status(404).json({ error: 'Project not found' });
   }
-  // canEdit tells the page whether to show the edit buttons
-  res.json({ project: { ...project, canEdit: isMember(project.teamId, req.user.id) } });
+  const investors = db
+    .prepare(
+      `SELECT u.id, u.name FROM project_interests pi
+       JOIN users u ON u.id = pi.investor_id
+       WHERE pi.project_id = ? ORDER BY pi.created_at`
+    )
+    .all(project.id);
+  const canEdit = isMember(project.teamId, req.user.id);
+
+  res.json({
+    project: {
+      ...project,
+      // canEdit tells the page whether to show the edit buttons
+      canEdit,
+      interestCount: investors.length,
+      interested: investors.some((investor) => investor.id === req.user.id),
+      // Only the team sees which investors are interested
+      investors: canEdit ? investors : undefined,
+    },
+  });
+});
+
+// An investor marks a project as "interested in investing"
+router.post('/:id/interest', (req, res) => {
+  const project = getProject(req.params.id);
+  if (!project) {
+    return res.status(404).json({ error: 'Project not found' });
+  }
+  if (req.user.role !== 'investor') {
+    return res.status(403).json({ error: 'Only investors can show interest in investing' });
+  }
+
+  db.prepare('INSERT OR IGNORE INTO project_interests (project_id, investor_id) VALUES (?, ?)').run(
+    project.id,
+    req.user.id
+  );
+  res.status(201).json({ message: 'The team can now see that you are interested in investing' });
+});
+
+router.delete('/:id/interest', (req, res) => {
+  db.prepare('DELETE FROM project_interests WHERE project_id = ? AND investor_id = ?').run(
+    req.params.id,
+    req.user.id
+  );
+  res.json({ message: 'Your interest has been removed' });
 });
 
 // Finds the project and checks that the logged in user is in its team.

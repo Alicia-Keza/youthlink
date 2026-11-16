@@ -78,3 +78,11 @@ CREATE TABLE IF NOT EXISTS feedback (
   comment TEXT NOT NULL,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Investors who marked a project as "interested in investing".
+CREATE TABLE IF NOT EXISTS project_interests (
+  project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  investor_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (project_id, investor_id)
+);
