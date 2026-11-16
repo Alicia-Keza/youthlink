@@ -34,6 +34,15 @@ router.put('/me', (req, res) => {
     req.user.id
   );
 
+  // Mentors and investors also describe their expertise and focus areas
+  if (req.user.role === 'mentor' || req.user.role === 'investor') {
+    const { expertise = '', focusAreas = [] } = req.body;
+    db.prepare(
+      `INSERT INTO mentor_profiles (user_id, expertise, focus_areas) VALUES (?, ?, ?)
+       ON CONFLICT(user_id) DO UPDATE SET expertise = excluded.expertise, focus_areas = excluded.focus_areas`
+    ).run(req.user.id, String(expertise).trim(), toText(focusAreas));
+  }
+
   res.json({ profile: getProfile(req.user.id) });
 });
 
