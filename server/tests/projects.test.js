@@ -129,3 +129,65 @@ describe('Project management (FR6)', () => {
     expect(res.body.projects).toHaveLength(0);
   });
 });
+
+describe('Investor interest in a project (FR6)', () => {
+  let diana;
+  let eric;
+  let investor;
+  let projectId;
+
+  beforeAll(async () => {
+    diana = await createUser('Diana');
+    eric = await createUser('Eric');
+    investor = await createUser('Ivan', { role: 'investor' });
+    await connect(diana, eric);
+
+    const team = await request(app)
+      .post('/api/teams')
+      .set(auth(diana))
+      .send({ name: 'Clean Water', memberIds: [eric.id] });
+    const project = await request(app)
+      .post('/api/projects')
+      .set(auth(diana))
+      .send({ teamId: team.body.team.id, title: 'Water filters' });
+    projectId = project.body.project.id;
+  });
+
+  test('an investor shows interest in a project', async () => {
+    const res = await request(app).post(`/api/projects/${projectId}/interest`).set(auth(investor));
+    expect(res.status).toBe(201);
+
+    const details = await request(app).get(`/api/projects/${projectId}`).set(auth(investor));
+    expect(details.body.project.interested).toBe(true);
+    expect(details.body.project.interestCount).toBe(1);
+  });
+
+  test('showing interest twice is only counted once', async () => {
+    await request(app).post(`/api/projects/${projectId}/interest`).set(auth(investor));
+
+    const details = await request(app).get(`/api/projects/${projectId}`).set(auth(investor));
+    expect(details.body.project.interestCount).toBe(1);
+  });
+
+  test('only investors can show interest', async () => {
+    const res = await request(app).post(`/api/projects/${projectId}/interest`).set(auth(eric));
+    expect(res.status).toBe(403);
+  });
+
+  test('the team sees which investors are interested, other users only see the count', async () => {
+    const member = await request(app).get(`/api/projects/${projectId}`).set(auth(diana));
+    expect(member.body.project.investors).toEqual([{ id: investor.id, name: 'Ivan' }]);
+
+    const visitor = await request(app).get(`/api/projects/${projectId}`).set(auth(investor));
+    expect(visitor.body.project.investors).toBeUndefined();
+  });
+
+  test('an investor can remove their interest', async () => {
+    const res = await request(app).delete(`/api/projects/${projectId}/interest`).set(auth(investor));
+    expect(res.status).toBe(200);
+
+    const details = await request(app).get(`/api/projects/${projectId}`).set(auth(investor));
+    expect(details.body.project.interested).toBe(false);
+    expect(details.body.project.interestCount).toBe(0);
+  });
+});
