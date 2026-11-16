@@ -1,20 +1,35 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../api';
+import { useAuth } from '../AuthContext';
 import { PROJECT_STAGES } from '../constants';
 
 export default function ProjectDetail() {
   const { id } = useParams();
+  const { user } = useAuth();
   const [project, setProject] = useState(null);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ title: '', description: '' });
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  function loadProject() {
     api(`/projects/${id}`)
       .then((data) => setProject(data.project))
       .catch((err) => setError(err.message));
-  }, [id]);
+  }
+
+  useEffect(loadProject, [id]);
+
+  // Investors can show or remove their interest in investing
+  async function toggleInterest() {
+    setError('');
+    try {
+      await api(`/projects/${id}/interest`, { method: project.interested ? 'DELETE' : 'POST' });
+      loadProject();
+    } catch (err) {
+      setError(err.message);
+    }
+  }
 
   function startEditing() {
     setForm({ title: project.title, description: project.description });
@@ -92,6 +107,27 @@ export default function ProjectDetail() {
           )}
         </section>
       )}
+
+      <section className="card">
+        <h2>Investment</h2>
+        <p className="muted">
+          {project.interestCount === 1
+            ? '1 investor is interested in this project.'
+            : `${project.interestCount} investors are interested in this project.`}
+        </p>
+        {project.canEdit && project.investors.length > 0 && (
+          <ul className="list">
+            {project.investors.map((investor) => (
+              <li key={investor.id}>{investor.name}</li>
+            ))}
+          </ul>
+        )}
+        {user.role === 'investor' && (
+          <button className={project.interested ? 'button secondary' : 'button'} onClick={toggleInterest}>
+            {project.interested ? 'Remove my interest' : 'I am interested in investing'}
+          </button>
+        )}
+      </section>
 
       {project.canEdit && (
         <section className="card form">
