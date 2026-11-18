@@ -7,6 +7,8 @@ export default defineConfig({
     // Send API calls to the Express server during development
     proxy: {
       '/api': 'http://localhost:4000',
+      // Live messages use a websocket on the same server
+      '/socket.io': { target: 'http://localhost:4000', ws: true },
     },
   },
 });

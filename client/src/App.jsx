@@ -13,6 +13,7 @@ import TeamDetail from './pages/TeamDetail';
 import NewProject from './pages/NewProject';
 import FindMentor from './pages/FindMentor';
 import MentorDashboard from './pages/MentorDashboard';
+import Messages from './pages/Messages';
 import Projects from './pages/Projects';
 import ProjectDetail from './pages/ProjectDetail';
 
@@ -33,6 +34,8 @@ export default function App() {
           <Route path="/teams/:id" element={<ProtectedRoute><TeamDetail /></ProtectedRoute>} />
           <Route path="/teams/:id/projects/new" element={<ProtectedRoute><NewProject /></ProtectedRoute>} />
           <Route path="/teams/:id/mentor" element={<ProtectedRoute><FindMentor /></ProtectedRoute>} />
+          <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+          <Route path="/messages/:userId" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
           <Route path="/mentoring" element={<ProtectedRoute><MentorDashboard /></ProtectedRoute>} />
           <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
           <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
