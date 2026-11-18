@@ -389,6 +389,16 @@ fieldset {
   color: var(--muted);
 }
 
+/* Requests on the mentor dashboard */
+.request {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.request:last-child {
+  border-bottom: none;
+}
+
 /* Small screens */
 @media (max-width: 600px) {
   h1 {
