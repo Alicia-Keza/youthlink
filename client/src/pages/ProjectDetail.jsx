@@ -10,6 +10,7 @@ export default function ProjectDetail() {
   const [project, setProject] = useState(null);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ title: '', description: '' });
+  const [comment, setComment] = useState('');
   const [error, setError] = useState('');
 
   function loadProject() {
@@ -19,6 +20,19 @@ export default function ProjectDetail() {
   }
 
   useEffect(loadProject, [id]);
+
+  // Mentors and investors leave feedback for the team
+  async function sendFeedback(e) {
+    e.preventDefault();
+    setError('');
+    try {
+      const data = await api(`/projects/${id}/feedback`, { method: 'POST', body: { comment } });
+      setProject({ ...project, feedback: data.feedback });
+      setComment('');
+    } catch (err) {
+      setError(err.message);
+    }
+  }
 
   // Investors can show or remove their interest in investing
   async function toggleInterest() {
@@ -126,6 +140,29 @@ export default function ProjectDetail() {
           <button className={project.interested ? 'button secondary' : 'button'} onClick={toggleInterest}>
             {project.interested ? 'Remove my interest' : 'I am interested in investing'}
           </button>
+        )}
+      </section>
+
+      <section className="card">
+        <h2>Feedback</h2>
+        {project.feedback.length === 0 && <p className="muted">No feedback yet.</p>}
+        {project.feedback.map((item) => (
+          <div className="request" key={item.id}>
+            <p>{item.comment}</p>
+            <p className="muted">
+              {item.authorName} ({item.authorRole}), {new Date(item.createdAt + 'Z').toLocaleDateString()}
+            </p>
+          </div>
+        ))}
+
+        {(user.role === 'mentor' || user.role === 'investor') && (
+          <form className="form" onSubmit={sendFeedback}>
+            <label>
+              Give feedback to the team
+              <textarea rows={3} value={comment} onChange={(e) => setComment(e.target.value)} maxLength={1000} required />
+            </label>
+            <button className="button" type="submit">Send feedback</button>
+          </form>
         )}
       </section>
 
