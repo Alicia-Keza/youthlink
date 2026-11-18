@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../AuthContext';
+import { connectSocket } from '../socket';
 
 function formatTime(createdAt) {
   // SQLite saves the time in UTC without a time zone, so add Z before reading it
@@ -43,6 +44,22 @@ export default function Messages() {
 
   useEffect(loadConversations, []);
   useEffect(loadChat, [userId]);
+
+  // Show new messages as soon as they arrive, without refreshing the page
+  useEffect(() => {
+    const socket = connectSocket();
+
+    socket.on('message', (message) => {
+      if (message.senderId === Number(userId)) {
+        // The open chat: load it again so the message is shown and marked as read
+        loadChat();
+      } else {
+        loadConversations();
+      }
+    });
+
+    return () => socket.disconnect();
+  }, [userId]);
 
   async function sendMessage(e) {
     e.preventDefault();
