@@ -374,6 +374,21 @@ fieldset {
   box-shadow: 0 0 0 2px var(--primary);
 }
 
+/* Mentorship request status */
+.status {
+  font-size: 0.9rem;
+}
+
+.status.accepted {
+  color: #166534;
+  font-weight: 600;
+}
+
+.status.pending,
+.status.declined {
+  color: var(--muted);
+}
+
 /* Small screens */
 @media (max-width: 600px) {
   h1 {
