@@ -2,6 +2,7 @@ const express = require('express');
 const db = require('../db');
 const requireAuth = require('../middleware/auth');
 const { areConnected } = require('../connectionHelpers');
+const { sendToUser } = require('../realtime');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -80,6 +81,9 @@ router.post('/:userId', (req, res) => {
     .prepare('INSERT INTO messages (sender_id, receiver_id, body) VALUES (?, ?, ?)')
     .run(req.user.id, receiverId, body);
   const message = db.prepare(`SELECT ${MESSAGE_FIELDS} FROM messages WHERE id = ?`).get(result.lastInsertRowid);
+
+  // Deliver the message straight away if the receiver has YouthLink open
+  sendToUser(receiverId, 'message', message);
 
   res.status(201).json({ message });
 });
