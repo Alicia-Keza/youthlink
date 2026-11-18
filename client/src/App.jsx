@@ -11,6 +11,7 @@ import Connections from './pages/Connections';
 import Teams from './pages/Teams';
 import TeamDetail from './pages/TeamDetail';
 import NewProject from './pages/NewProject';
+import FindMentor from './pages/FindMentor';
 import Projects from './pages/Projects';
 import ProjectDetail from './pages/ProjectDetail';
 
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/teams" element={<ProtectedRoute><Teams /></ProtectedRoute>} />
           <Route path="/teams/:id" element={<ProtectedRoute><TeamDetail /></ProtectedRoute>} />
           <Route path="/teams/:id/projects/new" element={<ProtectedRoute><NewProject /></ProtectedRoute>} />
+          <Route path="/teams/:id/mentor" element={<ProtectedRoute><FindMentor /></ProtectedRoute>} />
           <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
           <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
           <Route path="*" element={<p>Page not found.</p>} />
