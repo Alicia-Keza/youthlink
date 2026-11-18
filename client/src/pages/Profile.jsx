@@ -6,9 +6,19 @@ import { SKILL_CATEGORIES } from '../constants';
 import SkillTag from '../components/SkillTag';
 
 export default function Profile() {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ bio: '', education: '', location: '', interests: '', lookingFor: [] });
+  // Mentors and investors have extra fields and do not look for teammates
+  const isMentorOrInvestor = user.role === 'mentor' || user.role === 'investor';
+  const [form, setForm] = useState({
+    bio: '',
+    education: '',
+    location: '',
+    interests: '',
+    lookingFor: [],
+    expertise: '',
+    focusAreas: '',
+  });
   const [skills, setSkills] = useState([]);
   const [newSkill, setNewSkill] = useState({ name: '', category: SKILL_CATEGORIES[0] });
   const [deletePassword, setDeletePassword] = useState('');
@@ -24,6 +34,8 @@ export default function Profile() {
           location: profile.location,
           interests: profile.interests.join(', '),
           lookingFor: profile.lookingFor,
+          expertise: profile.expertise || '',
+          focusAreas: (profile.focusAreas || []).join(', '),
         });
         setSkills(profile.skills);
       })
@@ -48,7 +60,7 @@ export default function Profile() {
     try {
       await api('/profile/me', {
         method: 'PUT',
-        body: { ...form, interests: form.interests.split(',') },
+        body: { ...form, interests: form.interests.split(','), focusAreas: form.focusAreas.split(',') },
       });
       setMessage('Profile saved');
     } catch (err) {
@@ -149,21 +161,45 @@ export default function Profile() {
           <span className="muted">Separate them with commas</span>
         </label>
 
-        <fieldset>
-          <legend>Skills I am looking for in a teammate</legend>
-          <div className="checkbox-list">
-            {SKILL_CATEGORIES.map((category) => (
-              <label key={category} className="checkbox">
-                <input
-                  type="checkbox"
-                  checked={form.lookingFor.includes(category)}
-                  onChange={() => toggleLookingFor(category)}
-                />
-                <span>{category}</span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
+        {isMentorOrInvestor ? (
+          <>
+            <label>
+              My expertise
+              <input
+                name="expertise"
+                value={form.expertise}
+                onChange={updateField}
+                placeholder="For example Business strategy, Marketing, Software"
+              />
+            </label>
+            <label>
+              Focus areas
+              <input
+                name="focusAreas"
+                value={form.focusAreas}
+                onChange={updateField}
+                placeholder="Agriculture, Education, Health"
+              />
+              <span className="muted">The kinds of projects you want to support. Separate them with commas</span>
+            </label>
+          </>
+        ) : (
+          <fieldset>
+            <legend>Skills I am looking for in a teammate</legend>
+            <div className="checkbox-list">
+              {SKILL_CATEGORIES.map((category) => (
+                <label key={category} className="checkbox">
+                  <input
+                    type="checkbox"
+                    checked={form.lookingFor.includes(category)}
+                    onChange={() => toggleLookingFor(category)}
+                  />
+                  <span>{category}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        )}
 
         <button className="button" type="submit">Save profile</button>
       </form>
