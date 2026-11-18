@@ -73,7 +73,7 @@ export default function Connections() {
           {data.connected.map((item) => (
             <li key={item.id}>
               <span>{item.user.name}</span>
-              <span className="muted">Connected</span>
+              <Link to={`/messages/${item.user.id}`} className="button secondary">Message</Link>
             </li>
           ))}
         </ul>
