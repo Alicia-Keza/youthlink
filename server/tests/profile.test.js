@@ -111,3 +111,29 @@ describe('Profile and skills (FR2)', () => {
     expect(res.status).toBe(404);
   });
 });
+
+describe('Mentor and investor profile (FR7)', () => {
+  test('a mentor saves their expertise and focus areas', async () => {
+    const mentor = await createUser('Martha', { role: 'mentor' });
+
+    const res = await request(app)
+      .put('/api/profile/me')
+      .set(auth(mentor))
+      .send({ bio: 'Ten years in business', expertise: 'Business strategy', focusAreas: ['Agriculture', 'Retail'] });
+
+    expect(res.status).toBe(200);
+    expect(res.body.profile.expertise).toBe('Business strategy');
+    expect(res.body.profile.focusAreas).toEqual(['Agriculture', 'Retail']);
+  });
+
+  test('youth profiles do not have mentor fields', async () => {
+    const youth = await createUser('Yves');
+
+    const res = await request(app)
+      .put('/api/profile/me')
+      .set(auth(youth))
+      .send({ expertise: 'Should be ignored' });
+
+    expect(res.body.profile.expertise).toBeUndefined();
+  });
+});

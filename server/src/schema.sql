@@ -86,3 +86,10 @@ CREATE TABLE IF NOT EXISTS project_interests (
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (project_id, investor_id)
 );
+
+-- Extra profile details for mentors and investors.
+CREATE TABLE IF NOT EXISTS mentor_profiles (
+  user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  expertise TEXT NOT NULL DEFAULT '',
+  focus_areas TEXT NOT NULL DEFAULT ''
+);

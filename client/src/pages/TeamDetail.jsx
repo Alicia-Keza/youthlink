@@ -10,15 +10,22 @@ export default function TeamDetail() {
   const [team, setTeam] = useState(null);
   const [connections, setConnections] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [mentorRequests, setMentorRequests] = useState([]);
   const [newMemberId, setNewMemberId] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
-    Promise.all([api(`/teams/${id}`), api('/connections'), api(`/projects?teamId=${id}`)])
-      .then(([teamData, connectionData, projectData]) => {
+    Promise.all([
+      api(`/teams/${id}`),
+      api('/connections'),
+      api(`/projects?teamId=${id}`),
+      api(`/mentorship/team/${id}`),
+    ])
+      .then(([teamData, connectionData, projectData, mentorData]) => {
         setTeam(teamData.team);
         setConnections(connectionData.connected.map((item) => item.user));
         setProjects(projectData.projects);
+        setMentorRequests(mentorData.requests);
       })
       .catch((err) => setError(err.message));
   }, [id]);
@@ -125,6 +132,26 @@ export default function TeamDetail() {
           ))}
         </ul>
         <Link to={`/teams/${id}/projects/new`} className="button">Start a project</Link>
+      </section>
+
+      <section className="card">
+        <h2>Mentorship</h2>
+        {mentorRequests.length === 0 && (
+          <p className="muted">Your team has not asked a mentor yet. A mentor can give advice on your projects.</p>
+        )}
+        <ul className="list">
+          {mentorRequests.map((request) => (
+            <li key={request.id}>
+              <span>{request.mentorName}</span>
+              <span className={`status ${request.status}`}>
+                {request.status === 'pending' && 'Waiting for an answer'}
+                {request.status === 'accepted' && 'Mentoring your team'}
+                {request.status === 'declined' && 'Declined'}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <Link to={`/teams/${id}/mentor`} className="button secondary">Find a mentor</Link>
       </section>
 
       <button className="button danger" onClick={leaveTeam}>Leave team</button>

@@ -20,7 +20,7 @@ Create Account → Create Profile → Add Skills and Ideas → Discover Matches 
 | Connection requests | FR4 | Done |
 | Team formation | FR5 | Done |
 | Project management | FR6 | Done |
-| Mentorship | FR7 | Planned (Sprint 3) |
+| Mentorship | FR7 | Done |
 | In-app messaging | FR8 | Planned (Sprint 4) |
 | Notifications | FR9 | Planned (Sprint 4) |
 | Admin moderation | FR10 | Planned (Sprint 4) |
@@ -76,6 +76,10 @@ After running the seed script you can log in with any of these accounts. The pas
 | Grace Ingabire | grace@example.com | Design |
 | Samuel Habimana | samuel@example.com | Finance |
 | Claudine Mukamana | claudine@example.com | Media |
+| Jean Paul Niyonzima | mentor@example.com | Mentor |
+| Aline Uwimana | investor@example.com | Investor |
+
+The seed data also adds a team called Farm Connect (Eric, Diane and Patrick) with one project and a mentorship request waiting for Jean Paul to answer.
 
 ### Settings
 
@@ -113,7 +117,7 @@ All routes except register and login need the header `Authorization: Bearer <tok
 | GET | `/api/auth/me` | Get the logged in user |
 | DELETE | `/api/auth/me` | Delete my account and data |
 | GET | `/api/profile/me` | Get my profile |
-| PUT | `/api/profile/me` | Update my profile |
+| PUT | `/api/profile/me` | Update my profile (mentors and investors can also send `expertise` and `focusAreas`) |
 | POST | `/api/profile/me/skills` | Add a skill |
 | DELETE | `/api/profile/me/skills/:id` | Remove a skill |
 | GET | `/api/profile/:userId` | View another user's profile |
@@ -134,6 +138,13 @@ All routes except register and login need the header `Authorization: Bearer <tok
 | PUT | `/api/projects/:id/stage` | Update the stage (team members only) |
 | POST | `/api/projects/:id/interest` | Show interest in investing (investors only) |
 | DELETE | `/api/projects/:id/interest` | Remove my interest |
+| POST | `/api/projects/:id/feedback` | Give feedback on a project (mentors and investors only) |
+| GET | `/api/mentorship/mentors` | List mentors |
+| POST | `/api/mentorship` | Ask a mentor to guide my team |
+| GET | `/api/mentorship/team/:teamId` | Mentorship requests of my team |
+| GET | `/api/mentorship/requests` | Mentor dashboard: pending requests and teams I mentor |
+| PUT | `/api/mentorship/:id/accept` | Accept a mentorship request (mentor only) |
+| PUT | `/api/mentorship/:id/decline` | Decline a mentorship request (mentor only) |
 
 Project stages are Idea, Planning, In development and Launched.
 
@@ -150,6 +161,6 @@ server/   Express API, database schema and tests
 |---|---|---|
 | 1 | Planning and design (SRS and UML diagrams) | Done |
 | 2 | Core platform: accounts, profiles, matching, connections, teams | Done |
-| 3 | Projects and mentorship | In progress |
+| 3 | Projects and mentorship | Done |
 | 4 | Messaging, notifications and admin | Todo |
 | 5 | Testing, deployment and handover | Todo |

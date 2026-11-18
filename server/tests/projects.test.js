@@ -191,3 +191,60 @@ describe('Investor interest in a project (FR6)', () => {
     expect(details.body.project.interestCount).toBe(0);
   });
 });
+
+describe('Feedback on a project (FR6, FR7)', () => {
+  let frank;
+  let grace;
+  let mentor;
+  let projectId;
+
+  beforeAll(async () => {
+    frank = await createUser('Frank');
+    grace = await createUser('Grace');
+    mentor = await createUser('Martha', { role: 'mentor' });
+    await connect(frank, grace);
+
+    const team = await request(app)
+      .post('/api/teams')
+      .set(auth(frank))
+      .send({ name: 'Study Buddy', memberIds: [grace.id] });
+    const project = await request(app)
+      .post('/api/projects')
+      .set(auth(frank))
+      .send({ teamId: team.body.team.id, title: 'Revision app' });
+    projectId = project.body.project.id;
+  });
+
+  test('a mentor gives feedback on a project', async () => {
+    const res = await request(app)
+      .post(`/api/projects/${projectId}/feedback`)
+      .set(auth(mentor))
+      .send({ comment: 'Talk to ten students before you build more.' });
+
+    expect(res.status).toBe(201);
+    expect(res.body.feedback).toHaveLength(1);
+    expect(res.body.feedback[0].authorName).toBe('Martha');
+    expect(res.body.feedback[0].authorRole).toBe('mentor');
+  });
+
+  test('the team sees the feedback on the project', async () => {
+    const res = await request(app).get(`/api/projects/${projectId}`).set(auth(grace));
+
+    expect(res.body.project.feedback).toHaveLength(1);
+    expect(res.body.project.feedback[0].comment).toBe('Talk to ten students before you build more.');
+  });
+
+  test('feedback cannot be empty', async () => {
+    const res = await request(app).post(`/api/projects/${projectId}/feedback`).set(auth(mentor)).send({ comment: '  ' });
+    expect(res.status).toBe(400);
+  });
+
+  test('youth users cannot give feedback', async () => {
+    const res = await request(app)
+      .post(`/api/projects/${projectId}/feedback`)
+      .set(auth(frank))
+      .send({ comment: 'Our own project is great' });
+
+    expect(res.status).toBe(403);
+  });
+});

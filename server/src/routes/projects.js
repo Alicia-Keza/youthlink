@@ -84,8 +84,45 @@ router.get('/:id', (req, res) => {
       interested: investors.some((investor) => investor.id === req.user.id),
       // Only the team sees which investors are interested
       investors: canEdit ? investors : undefined,
+      feedback: getFeedback(project.id),
     },
   });
+});
+
+function getFeedback(projectId) {
+  return db
+    .prepare(
+      `SELECT f.id, f.comment, f.created_at AS createdAt, u.name AS authorName, u.role AS authorRole
+       FROM feedback f JOIN users u ON u.id = f.author_id
+       WHERE f.project_id = ? ORDER BY f.id DESC`
+    )
+    .all(projectId);
+}
+
+// Mentors and investors leave feedback on a project
+router.post('/:id/feedback', (req, res) => {
+  const project = getProject(req.params.id);
+  const comment = String(req.body.comment || '').trim();
+
+  if (!project) {
+    return res.status(404).json({ error: 'Project not found' });
+  }
+  if (req.user.role !== 'mentor' && req.user.role !== 'investor') {
+    return res.status(403).json({ error: 'Only mentors and investors can give feedback' });
+  }
+  if (!comment) {
+    return res.status(400).json({ error: 'Please write your feedback' });
+  }
+  if (comment.length > 1000) {
+    return res.status(400).json({ error: 'Feedback must be 1000 characters or less' });
+  }
+
+  db.prepare('INSERT INTO feedback (project_id, author_id, comment) VALUES (?, ?, ?)').run(
+    project.id,
+    req.user.id,
+    comment
+  );
+  res.status(201).json({ feedback: getFeedback(project.id) });
 });
 
 // An investor marks a project as "interested in investing"

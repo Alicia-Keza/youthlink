@@ -67,6 +67,26 @@ const users = [
   },
 ];
 
+// Demo mentor and investor
+const supporters = [
+  {
+    name: 'Jean Paul Niyonzima',
+    email: 'mentor@example.com',
+    role: 'mentor',
+    bio: 'I have run a small business for twelve years and enjoy helping young founders.',
+    expertise: 'Business strategy and sales',
+    focusAreas: ['Agriculture', 'Retail'],
+  },
+  {
+    name: 'Aline Uwimana',
+    email: 'investor@example.com',
+    role: 'investor',
+    bio: 'Angel investor looking for early projects led by young people.',
+    expertise: 'Early stage investment',
+    focusAreas: ['Agriculture', 'Education', 'Health'],
+  },
+];
+
 // [requester, receiver, status]
 const connections = [
   ['eric@example.com', 'diane@example.com', 'accepted'],
@@ -75,6 +95,11 @@ const connections = [
 ];
 
 db.exec(`
+  DELETE FROM feedback;
+  DELETE FROM project_interests;
+  DELETE FROM mentorship_requests;
+  DELETE FROM projects;
+  DELETE FROM mentor_profiles;
   DELETE FROM team_members;
   DELETE FROM teams;
   DELETE FROM connections;
@@ -115,4 +140,43 @@ for (const [requester, receiver, status] of connections) {
   );
 }
 
-console.log(`Added ${users.length} demo users. Password for all of them: ${PASSWORD}`);
+for (const person of supporters) {
+  const result = db
+    .prepare("INSERT INTO users (name, email, password_hash, role, consent_at) VALUES (?, ?, ?, ?, datetime('now'))")
+    .run(person.name, person.email, passwordHash, person.role);
+  const userId = result.lastInsertRowid;
+  ids[person.email] = userId;
+
+  db.prepare('INSERT INTO profiles (user_id, bio, location) VALUES (?, ?, ?)').run(userId, person.bio, 'Kigali');
+  db.prepare('INSERT INTO mentor_profiles (user_id, expertise, focus_areas) VALUES (?, ?, ?)').run(
+    userId,
+    person.expertise,
+    person.focusAreas.join(',')
+  );
+}
+
+// A demo team with a project and a mentorship request waiting for an answer
+const team = db
+  .prepare('INSERT INTO teams (name, description, created_by) VALUES (?, ?, ?)')
+  .run('Farm Connect', 'Linking small farmers in Rwanda to buyers', ids['eric@example.com']);
+const teamId = team.lastInsertRowid;
+
+for (const email of ['eric@example.com', 'diane@example.com', 'patrick@example.com']) {
+  db.prepare('INSERT INTO team_members (team_id, user_id) VALUES (?, ?)').run(teamId, ids[email]);
+}
+
+db.prepare('INSERT INTO projects (team_id, title, description, stage) VALUES (?, ?, ?, ?)').run(
+  teamId,
+  'Farmers market app',
+  'A web app where farmers list their harvest and buyers order directly.',
+  'Planning'
+);
+
+db.prepare('INSERT INTO mentorship_requests (team_id, mentor_id, message) VALUES (?, ?, ?)').run(
+  teamId,
+  ids['mentor@example.com'],
+  'We would like advice on how to reach our first buyers.'
+);
+
+const total = users.length + supporters.length;
+console.log(`Added ${total} demo users, 1 team and 1 project. Password for all of them: ${PASSWORD}`);

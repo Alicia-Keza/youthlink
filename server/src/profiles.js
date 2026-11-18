@@ -17,7 +17,7 @@ function getProfile(userId) {
 
   if (!row) return null;
 
-  return {
+  const profile = {
     id: row.id,
     name: row.name,
     role: row.role,
@@ -28,6 +28,15 @@ function getProfile(userId) {
     lookingFor: toList(row.looking_for),
     skills: getSkills(userId),
   };
+
+  // Mentors and investors also have their expertise and focus areas
+  if (row.role === 'mentor' || row.role === 'investor') {
+    const extra = db.prepare('SELECT expertise, focus_areas FROM mentor_profiles WHERE user_id = ?').get(userId);
+    profile.expertise = extra ? extra.expertise : '';
+    profile.focusAreas = toList(extra ? extra.focus_areas : '');
+  }
+
+  return profile;
 }
 
 module.exports = { getProfile, getSkills };
