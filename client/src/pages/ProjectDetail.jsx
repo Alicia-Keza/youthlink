@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../AuthContext';
 import { PROJECT_STAGES } from '../constants';
+import ReportButton from '../components/ReportButton';
 
 export default function ProjectDetail() {
   const { id } = useParams();
@@ -119,6 +120,8 @@ export default function ProjectDetail() {
               Edit project
             </button>
           )}
+          {/* People outside the team can report a project that breaks the rules */}
+          {!project.canEdit && <ReportButton contentType="project" contentId={project.id} />}
         </section>
       )}
 
@@ -152,6 +155,7 @@ export default function ProjectDetail() {
             <p className="muted">
               {item.authorName} ({item.authorRole}), {new Date(item.createdAt + 'Z').toLocaleDateString()}
             </p>
+            <ReportButton contentType="feedback" contentId={item.id} />
           </div>
         ))}
 

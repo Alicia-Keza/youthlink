@@ -510,6 +510,16 @@ fieldset {
   white-space: nowrap;
 }
 
+/* Report link and form */
+.report-link {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.report-form {
+  margin-top: 0.5rem;
+}
+
 /* Small screens */
 @media (max-width: 600px) {
   .chat-layout {
