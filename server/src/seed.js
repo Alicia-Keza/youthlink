@@ -95,6 +95,9 @@ const connections = [
 ];
 
 db.exec(`
+  DELETE FROM reports;
+  DELETE FROM notifications;
+  DELETE FROM messages;
   DELETE FROM feedback;
   DELETE FROM project_interests;
   DELETE FROM mentorship_requests;
@@ -155,6 +158,12 @@ for (const person of supporters) {
   );
 }
 
+// Administrator account. Admins cannot sign up, so this is the only way to get one for the demo.
+const admin = db
+  .prepare("INSERT INTO users (name, email, password_hash, role, consent_at) VALUES (?, ?, ?, 'admin', datetime('now'))")
+  .run('YouthLink Admin', 'admin@example.com', passwordHash);
+db.prepare('INSERT INTO profiles (user_id) VALUES (?)').run(admin.lastInsertRowid);
+
 // A demo team with a project and a mentorship request waiting for an answer
 const team = db
   .prepare('INSERT INTO teams (name, description, created_by) VALUES (?, ?, ?)')
@@ -178,5 +187,6 @@ db.prepare('INSERT INTO mentorship_requests (team_id, mentor_id, message) VALUES
   'We would like advice on how to reach our first buyers.'
 );
 
-const total = users.length + supporters.length;
-console.log(`Added ${total} demo users, 1 team and 1 project. Password for all of them: ${PASSWORD}`);
+const total = users.length + supporters.length + 1;
+console.log(`Added ${total} demo users (including admin@example.com), 1 team and 1 project.`);
+console.log(`Password for all of them: ${PASSWORD}`);
