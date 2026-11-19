@@ -114,3 +114,15 @@ CREATE TABLE IF NOT EXISTS notifications (
   read_at TEXT,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Content that users reported as inappropriate, for the admin team to review.
+-- content_type is 'project' or 'feedback'.
+CREATE TABLE IF NOT EXISTS reports (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  reporter_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  content_type TEXT NOT NULL CHECK (content_type IN ('project', 'feedback')),
+  content_id INTEGER NOT NULL,
+  reason TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'removed', 'dismissed')),
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
