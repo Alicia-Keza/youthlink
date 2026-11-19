@@ -15,6 +15,7 @@ import FindMentor from './pages/FindMentor';
 import MentorDashboard from './pages/MentorDashboard';
 import Messages from './pages/Messages';
 import Notifications from './pages/Notifications';
+import AdminDashboard from './pages/AdminDashboard';
 import Projects from './pages/Projects';
 import ProjectDetail from './pages/ProjectDetail';
 
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
           <Route path="/messages/:userId" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
           <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+          <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
           <Route path="/mentoring" element={<ProtectedRoute><MentorDashboard /></ProtectedRoute>} />
           <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
           <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />

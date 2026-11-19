@@ -491,6 +491,25 @@ fieldset {
   color: var(--primary);
 }
 
+/* Users table on the admin dashboard */
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.table th,
+.table td {
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+
 /* Small screens */
 @media (max-width: 600px) {
   .chat-layout {
