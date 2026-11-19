@@ -2,6 +2,7 @@ const express = require('express');
 const db = require('../db');
 const requireAuth = require('../middleware/auth');
 const { findConnection } = require('../connectionHelpers');
+const notify = require('../notify');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -64,6 +65,8 @@ router.post('/', (req, res) => {
     .prepare('INSERT INTO connections (requester_id, receiver_id) VALUES (?, ?)')
     .run(req.user.id, receiverId);
 
+  notify(receiverId, 'connection', `${req.user.name} wants to connect with you`, '/connections');
+
   res.status(201).json({ connection: { id: result.lastInsertRowid, status: 'pending' } });
 });
 
@@ -77,6 +80,13 @@ function answerRequest(status) {
     if (result.changes === 0) {
       return res.status(404).json({ error: 'Connection request not found' });
     }
+
+    // Let the sender know when their request is accepted
+    if (status === 'accepted') {
+      const connection = db.prepare('SELECT requester_id FROM connections WHERE id = ?').get(req.params.id);
+      notify(connection.requester_id, 'connection', `${req.user.name} accepted your connection request`, '/connections');
+    }
+
     res.json({ connection: { id: Number(req.params.id), status } });
   };
 }

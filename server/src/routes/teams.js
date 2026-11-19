@@ -4,6 +4,7 @@ const requireAuth = require('../middleware/auth');
 const { areConnected } = require('../connectionHelpers');
 const { getSkills } = require('../profiles');
 const { isMember } = require('../teamHelpers');
+const notify = require('../notify');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -59,7 +60,12 @@ router.post('/', (req, res) => {
     return teamId;
   });
 
-  res.status(201).json({ team: getTeam(createTeam()) });
+  const teamId = createTeam();
+  ids.forEach((id) => {
+    notify(id, 'team', `${req.user.name} added you to the team ${name}`, `/teams/${teamId}`);
+  });
+
+  res.status(201).json({ team: getTeam(teamId) });
 });
 
 // Lists the teams I am a member of
@@ -106,6 +112,8 @@ router.post('/:id/members', (req, res) => {
   }
 
   db.prepare('INSERT INTO team_members (team_id, user_id) VALUES (?, ?)').run(team.id, userId);
+  notify(userId, 'team', `${req.user.name} added you to the team ${team.name}`, `/teams/${team.id}`);
+
   res.status(201).json({ team: getTeam(team.id) });
 });
 

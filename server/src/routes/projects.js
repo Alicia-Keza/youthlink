@@ -2,7 +2,8 @@ const express = require('express');
 const db = require('../db');
 const requireAuth = require('../middleware/auth');
 const PROJECT_STAGES = require('../projectStages');
-const { isMember } = require('../teamHelpers');
+const { isMember, memberIds } = require('../teamHelpers');
+const notify = require('../notify');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -122,6 +123,11 @@ router.post('/:id/feedback', (req, res) => {
     req.user.id,
     comment
   );
+
+  memberIds(project.teamId).forEach((userId) => {
+    notify(userId, 'feedback', `${req.user.name} gave feedback on ${project.title}`, `/projects/${project.id}`);
+  });
+
   res.status(201).json({ feedback: getFeedback(project.id) });
 });
 

@@ -1,5 +1,6 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
+import NotificationBell from './NotificationBell';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -22,6 +23,7 @@ export default function Navbar() {
             <NavLink to="/teams">Teams</NavLink>
             <NavLink to="/projects">Projects</NavLink>
             <NavLink to="/messages">Messages</NavLink>
+            <NotificationBell />
             {user.role === 'mentor' && <NavLink to="/mentoring">Mentoring</NavLink>}
             <NavLink to="/profile">Profile</NavLink>
             <button className="link-button" onClick={handleLogout}>Log out</button>
