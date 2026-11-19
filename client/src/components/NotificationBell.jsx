@@ -10,11 +10,19 @@ export default function NotificationBell() {
 
   // Check the count again when the user moves to another page,
   // for example after reading notifications
-  useEffect(() => {
+  function loadCount() {
     api('/notifications')
       .then((data) => setUnread(data.unread))
       .catch(() => setUnread(0));
-  }, [location.pathname]);
+  }
+
+  useEffect(loadCount, [location.pathname]);
+
+  // The notifications page sends this event after "Mark all as read"
+  useEffect(() => {
+    window.addEventListener('notifications-changed', loadCount);
+    return () => window.removeEventListener('notifications-changed', loadCount);
+  }, []);
 
   // Add one to the count as soon as a new notification arrives
   useEffect(() => {

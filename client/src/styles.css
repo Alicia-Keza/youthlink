@@ -474,6 +474,23 @@ fieldset {
   align-items: center;
 }
 
+/* Notifications page */
+.page-header {
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.notification {
+  color: var(--text);
+  text-align: left;
+  text-decoration: none;
+}
+
+.unread .notification {
+  font-weight: 600;
+  color: var(--primary);
+}
+
 /* Small screens */
 @media (max-width: 600px) {
   .chat-layout {
