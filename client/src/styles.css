@@ -467,6 +467,13 @@ fieldset {
   font-size: 0.75rem;
 }
 
+/* Notification link in the navbar */
+.bell {
+  display: inline-flex;
+  gap: 0.3rem;
+  align-items: center;
+}
+
 /* Small screens */
 @media (max-width: 600px) {
   .chat-layout {
