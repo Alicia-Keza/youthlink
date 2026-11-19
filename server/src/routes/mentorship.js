@@ -2,7 +2,8 @@ const express = require('express');
 const db = require('../db');
 const requireAuth = require('../middleware/auth');
 const { getProfile } = require('../profiles');
-const { isMember } = require('../teamHelpers');
+const { isMember, memberIds } = require('../teamHelpers');
+const notify = require('../notify');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -23,7 +24,7 @@ router.post('/', (req, res) => {
   const mentorId = Number(req.body.mentorId);
   const message = String(req.body.message || '').trim();
 
-  const team = db.prepare('SELECT id FROM teams WHERE id = ?').get(teamId);
+  const team = db.prepare('SELECT id, name FROM teams WHERE id = ?').get(teamId);
   if (!team) {
     return res.status(404).json({ error: 'Team not found' });
   }
@@ -46,6 +47,8 @@ router.post('/', (req, res) => {
   const result = db
     .prepare('INSERT INTO mentorship_requests (team_id, mentor_id, message) VALUES (?, ?, ?)')
     .run(teamId, mentorId, message);
+
+  notify(mentorId, 'mentorship', `The team ${team.name} asked you to be their mentor`, '/mentoring');
 
   res.status(201).json({ request: { id: result.lastInsertRowid, status: 'pending' } });
 });
@@ -96,6 +99,14 @@ function answerRequest(status) {
 
     if (result.changes === 0) {
       return res.status(404).json({ error: 'Mentorship request not found' });
+    }
+
+    // Tell everyone in the team that the mentor said yes
+    if (status === 'accepted') {
+      const request = db.prepare('SELECT team_id FROM mentorship_requests WHERE id = ?').get(req.params.id);
+      memberIds(request.team_id).forEach((userId) => {
+        notify(userId, 'mentorship', `${req.user.name} accepted to mentor your team`, `/teams/${request.team_id}`);
+      });
     }
     res.json({ request: { id: Number(req.params.id), status } });
   };

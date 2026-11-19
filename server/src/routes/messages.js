@@ -3,6 +3,7 @@ const db = require('../db');
 const requireAuth = require('../middleware/auth');
 const { areConnected } = require('../connectionHelpers');
 const { sendToUser } = require('../realtime');
+const notify = require('../notify');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -84,6 +85,7 @@ router.post('/:userId', (req, res) => {
 
   // Deliver the message straight away if the receiver has YouthLink open
   sendToUser(receiverId, 'message', message);
+  notify(receiverId, 'message', `New message from ${req.user.name}`, `/messages/${req.user.id}`);
 
   res.status(201).json({ message });
 });
