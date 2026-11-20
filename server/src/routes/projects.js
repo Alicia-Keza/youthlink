@@ -4,6 +4,7 @@ const requireAuth = require('../middleware/auth');
 const PROJECT_STAGES = require('../projectStages');
 const { isMember, memberIds } = require('../teamHelpers');
 const notify = require('../notify');
+const { checkLengths } = require('../validation');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -50,6 +51,13 @@ router.post('/', (req, res) => {
   }
   if (!title) {
     return res.status(400).json({ error: 'Project title is required' });
+  }
+  const lengthError = checkLengths([
+    [title, 120, 'Project title'],
+    [description, 2000, 'Description'],
+  ]);
+  if (lengthError) {
+    return res.status(400).json({ error: lengthError });
   }
   if (!PROJECT_STAGES.includes(stage)) {
     return res.status(400).json({ error: 'Please choose a valid project stage' });
@@ -179,6 +187,13 @@ router.put('/:id', (req, res) => {
   const description = String(req.body.description || '').trim();
   if (!title) {
     return res.status(400).json({ error: 'Project title is required' });
+  }
+  const lengthError = checkLengths([
+    [title, 120, 'Project title'],
+    [description, 2000, 'Description'],
+  ]);
+  if (lengthError) {
+    return res.status(400).json({ error: lengthError });
   }
 
   db.prepare("UPDATE projects SET title = ?, description = ?, updated_at = datetime('now') WHERE id = ?").run(

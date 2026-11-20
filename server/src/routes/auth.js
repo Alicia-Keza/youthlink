@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 const db = require('../db');
 const config = require('../config');
 const requireAuth = require('../middleware/auth');
+const { loginLimiter, registerLimiter } = require('../middleware/rateLimit');
+const { checkLengths } = require('../validation');
 
 const router = express.Router();
 
@@ -14,11 +16,23 @@ function createToken(user) {
   return jwt.sign({ id: user.id, role: user.role }, config.jwtSecret, { expiresIn: '7d' });
 }
 
-router.post('/register', (req, res) => {
+router.post('/register', registerLimiter, (req, res) => {
   const { name, email, password, role, consent } = req.body;
 
   if (!name || !email || !password) {
     return res.status(400).json({ error: 'Name, email and password are required' });
+  }
+  if (typeof name !== 'string' || typeof email !== 'string' || typeof password !== 'string') {
+    return res.status(400).json({ error: 'Name, email and password must be text' });
+  }
+  // bcrypt only uses the first 72 characters of a password, so longer ones are refused
+  const lengthError = checkLengths([
+    [name, 100, 'Name'],
+    [email, 254, 'Email'],
+    [password, 72, 'Password'],
+  ]);
+  if (lengthError) {
+    return res.status(400).json({ error: lengthError });
   }
   if (!/^\S+@\S+\.\S+$/.test(email)) {
     return res.status(400).json({ error: 'Please enter a valid email address' });
@@ -50,10 +64,10 @@ router.post('/register', (req, res) => {
   res.status(201).json({ token: createToken(user), user });
 });
 
-router.post('/login', (req, res) => {
+router.post('/login', loginLimiter, (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
+  if (typeof email !== 'string' || typeof password !== 'string' || !email || !password) {
     return res.status(400).json({ error: 'Email and password are required' });
   }
 

@@ -4,6 +4,7 @@ const requireAuth = require('../middleware/auth');
 const SKILL_CATEGORIES = require('../skillCategories');
 const { toList, toText } = require('../lists');
 const { getProfile } = require('../profiles');
+const { checkLengths, checkList } = require('../validation');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -15,8 +16,17 @@ router.get('/me', (req, res) => {
 router.put('/me', (req, res) => {
   const { bio = '', education = '', location = '', interests = [], lookingFor = [] } = req.body;
 
-  if (String(bio).length > 500) {
-    return res.status(400).json({ error: 'Bio must be 500 characters or less' });
+  const error =
+    checkLengths([
+      [bio, 500, 'Bio'],
+      [education, 200, 'Education'],
+      [location, 100, 'Location'],
+      [req.body.expertise, 200, 'Expertise'],
+    ]) ||
+    checkList(interests, 'Interests') ||
+    checkList(req.body.focusAreas, 'Focus areas');
+  if (error) {
+    return res.status(400).json({ error });
   }
 
   // Only known skill areas can be saved as "looking for"
@@ -52,6 +62,9 @@ router.post('/me/skills', (req, res) => {
 
   if (!name) {
     return res.status(400).json({ error: 'Skill name is required' });
+  }
+  if (name.length > 50) {
+    return res.status(400).json({ error: 'Skill name must be 50 characters or less' });
   }
   if (!SKILL_CATEGORIES.includes(category)) {
     return res.status(400).json({ error: 'Please choose a valid skill category' });

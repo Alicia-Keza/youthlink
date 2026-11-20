@@ -24,6 +24,10 @@ router.post('/', (req, res) => {
   const mentorId = Number(req.body.mentorId);
   const message = String(req.body.message || '').trim();
 
+  if (message.length > 500) {
+    return res.status(400).json({ error: 'Message must be 500 characters or less' });
+  }
+
   const team = db.prepare('SELECT id, name FROM teams WHERE id = ?').get(teamId);
   if (!team) {
     return res.status(404).json({ error: 'Team not found' });
