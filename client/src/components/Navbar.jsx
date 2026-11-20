@@ -27,12 +27,14 @@ export default function Navbar() {
             {user.role === 'mentor' && <NavLink to="/mentoring">Mentoring</NavLink>}
             {user.role === 'admin' && <NavLink to="/admin">Admin</NavLink>}
             <NavLink to="/profile">Profile</NavLink>
+            <NavLink to="/help">Help</NavLink>
             <button className="link-button" onClick={handleLogout}>Log out</button>
           </>
         ) : (
           <>
             <NavLink to="/login">Log in</NavLink>
             <NavLink to="/register">Sign up</NavLink>
+            <NavLink to="/help">Help</NavLink>
           </>
         )}
       </nav>

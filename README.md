@@ -2,9 +2,11 @@
 
 A platform to transform ideas into real businesses through the collaboration of youth with different skills.
 
+**Live demo:** the link will be added here after deployment.
+
 ## About
 
-YouthLink helps young people connect, share their skills and ideas, and find others with complementary skills. For example, a software developer can match with someone who has a business idea, marketing skills or financial skills, so they can form a team and develop a project together. Later on, teams can get mentorship and attract investors.
+YouthLink helps young people connect, share their skills and ideas, and find others with complementary skills. For example, a software developer can match with someone who has a business idea, marketing skills or financial skills, so they can form a team and develop a project together. Teams can then ask mentors for guidance, receive feedback, and attract investors.
 
 ## How it works
 
@@ -12,36 +14,58 @@ Create Account → Create Profile → Add Skills and Ideas → Discover Matches 
 
 ## Features
 
-| Feature | Requirement | Status |
+| Feature | Requirement | What users can do |
 |---|---|---|
-| Registration and login | FR1 | Done |
-| User profile with skills and interests | FR2 | Done |
-| Skill-based matching | FR3 | Done |
-| Connection requests | FR4 | Done |
-| Team formation | FR5 | Done |
-| Project management | FR6 | Done |
-| Mentorship | FR7 | Done |
-| In-app messaging | FR8 | Planned (Sprint 4) |
-| Notifications | FR9 | Planned (Sprint 4) |
-| Admin moderation | FR10 | Planned (Sprint 4) |
+| Registration and login | FR1 | Sign up as a youth, mentor or investor, give consent, log in and out, delete their account |
+| User profile | FR2 | Add skills, bio, education, location, interests and the skills they are looking for |
+| Skill-based matching | FR3 | See people with complementary skills, best match first, with search and filter |
+| Connections | FR4 | Send, accept and decline connection requests |
+| Team formation | FR5 | Form a team with connections and see which skill areas the team covers |
+| Project management | FR6 | Create and edit projects, update their stage, browse all projects, show interest in investing |
+| Mentorship | FR7 | Ask a mentor to guide the team, accept or decline as a mentor, give feedback on projects |
+| In-app messaging | FR8 | Send private messages to connections, delivered in real time |
+| Notifications | FR9 | Get notified about requests, teams, messages, mentorship and feedback, with an unread count |
+| Admin moderation | FR10 | Report content; admins remove inappropriate content and suspend users |
+| Help page | SRS 2.6 | Step by step user guide and frequently asked questions |
 
 ## Tech stack
 
 - Frontend: React (Vite), React Router, plain CSS
 - Backend: Node.js and Express (REST API with JSON)
-- Database: SQLite
+- Real time: Socket.IO
+- Database: SQLite (better-sqlite3)
 - Authentication: JWT, passwords hashed with bcrypt
+- Security: helmet, login rate limiting, input checks
 - Testing: Jest and Supertest
+- Hosting: Render (free plan)
 
 ## Development model
 
-The project follows the Agile model and is built in short sprints. Each sprint ends with testing and feedback before the next one starts.
+The project follows the Agile model and was built in short sprints. Each sprint ends with testing and feedback before the next one starts.
 
-## Getting started
+| Sprint | Focus | Status |
+|---|---|---|
+| 1 | Planning and design (SRS and UML diagrams) | Done |
+| 2 | Core platform: accounts, profiles, matching, connections, teams | Done |
+| 3 | Projects and mentorship | Done |
+| 4 | Messaging, notifications and admin | Done |
+| 5 | Security, backups, deployment, testing and handover | In progress |
 
-You need Node.js 20 or newer.
+## Run it on your computer
 
-### 1. Start the server
+### What you need
+
+- [Node.js](https://nodejs.org) version 20 or newer. Check with `node --version`.
+- [Git](https://git-scm.com), to download the code.
+
+### 1. Download the code
+
+```
+git clone https://github.com/Alicia-Keza/youthlink.git
+cd youthlink
+```
+
+### 2. Install and start the server
 
 ```
 cd server
@@ -50,11 +74,13 @@ npm run seed
 npm start
 ```
 
-The API runs on http://localhost:4000. `npm run seed` is optional, it fills the database with demo users.
+Leave this terminal open. You should see `YouthLink API running on http://localhost:4000`.
 
-### 2. Start the client
+`npm run seed` fills the database with demo accounts, a team and a project. It deletes all existing data first, so only run it when you want to start fresh.
 
-Open a second terminal:
+### 3. Install and start the client
+
+Open a **second** terminal in the `youthlink` folder:
 
 ```
 cd client
@@ -64,32 +90,27 @@ npm run dev
 
 Then open http://localhost:5173 in the browser.
 
-### Demo accounts
+### 4. Log in with a demo account
 
-After running the seed script you can log in with any of these accounts. The password for all of them is `password123`.
+The password for every demo account is `password123`.
 
-| Name | Email | Skills |
-|---|---|---|
-| Eric Mugisha | eric@example.com | Technology |
-| Diane Uwase | diane@example.com | Marketing |
-| Patrick Nshuti | patrick@example.com | Business |
-| Grace Ingabire | grace@example.com | Design |
-| Samuel Habimana | samuel@example.com | Finance |
-| Claudine Mukamana | claudine@example.com | Media |
-| Jean Paul Niyonzima | mentor@example.com | Mentor |
-| Aline Uwimana | investor@example.com | Investor |
+| Name | Email | Role | Good for trying |
+|---|---|---|---|
+| Eric Mugisha | eric@example.com | Youth (Technology) | Matches, connections, teams, projects, messages |
+| Diane Uwase | diane@example.com | Youth (Marketing) | Messaging Eric live from a second browser |
+| Patrick Nshuti | patrick@example.com | Youth (Business) | Team member of Farm Connect |
+| Grace Ingabire | grace@example.com | Youth (Design) | Has a pending connection request to Eric |
+| Samuel Habimana | samuel@example.com | Youth (Finance) | A match for Eric who is not connected yet |
+| Claudine Mukamana | claudine@example.com | Youth (Media) | Another match |
+| Jean Paul Niyonzima | mentor@example.com | Mentor | Mentoring page, feedback on projects |
+| Aline Uwimana | investor@example.com | Investor | "Interested in investing", feedback, reporting |
+| YouthLink Admin | admin@example.com | Administrator | Admin page: reports and suspending users |
 
-The seed data also adds a team called Farm Connect (Eric, Diane and Patrick) with one project and a mentorship request waiting for Jean Paul to answer.
+The demo data also includes a team called **Farm Connect** (Eric, Diane and Patrick) with a project and a mentorship request waiting for Jean Paul to answer.
 
-### Settings
+### To stop
 
-The server reads these environment variables. All of them have defaults for local development.
-
-| Variable | Default | Purpose |
-|---|---|---|
-| `PORT` | `4000` | Port of the API |
-| `JWT_SECRET` | development value | Secret used to sign login tokens. Must be changed in production |
-| `DB_FILE` | `server/youthlink.db` | Location of the SQLite database file |
+Press `Ctrl + C` in each terminal.
 
 ## Running the tests
 
@@ -97,6 +118,47 @@ The server reads these environment variables. All of them have defaults for loca
 cd server
 npm test
 ```
+
+There are 131 API tests covering FR1 to FR10, security, input checks, backups and the demo data.
+
+## Settings
+
+The server reads these environment variables. All of them have defaults for local development.
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `PORT` | `4000` | Port of the server |
+| `NODE_ENV` | not set | Set to `production` on the live server: serves the React pages, forces HTTPS and requires `JWT_SECRET` |
+| `JWT_SECRET` | development value | Secret used to sign login tokens. Required in production |
+| `DB_FILE` | `server/youthlink.db` | Location of the SQLite database file |
+| `BACKUP_DIR` | `server/backups` | Folder for the daily database backups |
+| `SEED_IF_EMPTY` | not set | When `true`, the demo data is added if the database is empty at start-up |
+
+## Deployment
+
+The live version runs on [Render](https://render.com)'s free plan. The settings are in [render.yaml](render.yaml).
+
+1. Sign in to Render with GitHub.
+2. Choose **New** → **Blueprint** and select this repository.
+3. Render reads `render.yaml`, builds the app with `npm run build` and starts it with `npm start`. It also creates a random `JWT_SECRET`.
+4. When the build finishes, Render shows the public link.
+
+In production a single Express server sends both the API and the React pages, so there is only one link.
+
+### Limits of the free plan
+
+- The app goes to sleep after 15 minutes without visitors. The first visit after that can take up to a minute while it wakes up.
+- The free plan has no permanent disk, so the database is emptied every time the app restarts or wakes up. The demo accounts are added again automatically (`SEED_IF_EMPTY=true`), but accounts and content created on the live site do not last. For the same reason, the daily backups only work properly on a paid plan with a disk, or when running on your own computer.
+
+## Security and privacy
+
+- Passwords are hashed with bcrypt and never stored as plain text
+- Users must give consent at sign-up and can delete their account and all their data
+- After 10 wrong passwords, login is blocked for 15 minutes
+- Every form field is checked on the server for type and length
+- Security headers are sent with every response, and HTTPS is required in production
+- Only connected users can message each other, and email addresses are not shown to other users
+- Administrators can suspend users and remove reported content
 
 ## How matching works
 
@@ -106,12 +168,23 @@ Each user adds the skills they have, and chooses the skill areas they are lookin
 - 2 points for each skill area I have that the other person is looking for
 - 1 point for each shared interest
 
+## Troubleshooting
+
+| Problem | Solution |
+|---|---|
+| Login or sign-up does nothing or shows an error | The server is not running. Start it with `npm start` in the `server` folder and keep that terminal open |
+| "Too many failed login attempts" | Wait 15 minutes, or restart the server when running it on your computer |
+| No matches | Add at least one skill and tick the skill areas you are looking for on your profile |
+| The live site is slow to open | It is waking up after sleeping. Wait up to a minute |
+| `npm start` says it cannot find package.json | Make sure you are inside the `server` folder |
+
 ## API overview
 
-All routes except register and login need the header `Authorization: Bearer <token>`.
+All routes except register, login and health need the header `Authorization: Bearer <token>`.
 
 | Method | Route | Description |
 |---|---|---|
+| GET | `/api/health` | Check that the server is running |
 | POST | `/api/auth/register` | Create an account (consent is required) |
 | POST | `/api/auth/login` | Log in and get a token |
 | GET | `/api/auth/me` | Get the logged in user |
@@ -145,22 +218,37 @@ All routes except register and login need the header `Authorization: Bearer <tok
 | GET | `/api/mentorship/requests` | Mentor dashboard: pending requests and teams I mentor |
 | PUT | `/api/mentorship/:id/accept` | Accept a mentorship request (mentor only) |
 | PUT | `/api/mentorship/:id/decline` | Decline a mentorship request (mentor only) |
+| GET | `/api/messages` | My conversations with the last message and unread count |
+| GET | `/api/messages/:userId` | Messages with one user (marks them as read) |
+| POST | `/api/messages/:userId` | Send a message to a connection |
+| GET | `/api/notifications` | My notifications and the unread count |
+| PUT | `/api/notifications/:id/read` | Mark one notification as read |
+| PUT | `/api/notifications/read-all` | Mark all notifications as read |
+| POST | `/api/reports` | Report a project or feedback as inappropriate |
+| GET | `/api/admin/users` | All users (admin only) |
+| PUT | `/api/admin/users/:id/suspend` | Suspend a user (admin only) |
+| PUT | `/api/admin/users/:id/unsuspend` | Unsuspend a user (admin only) |
+| GET | `/api/admin/reports` | Open reports, or all with `?status=all` (admin only) |
+| PUT | `/api/admin/reports/:id/remove` | Remove the reported content (admin only) |
+| PUT | `/api/admin/reports/:id/dismiss` | Keep the content and close the report (admin only) |
 
 Project stages are Idea, Planning, In development and Launched.
+
+Real-time events are sent with Socket.IO on the same server. The browser connects with its login token and receives `message` and `notification` events.
 
 ## Project structure
 
 ```
-client/   React frontend
-server/   Express API, database schema and tests
+youthlink/
+  package.json    build and start commands used by Render
+  render.yaml     Render settings
+  client/         React frontend
+    src/pages/        one file per page
+    src/components/   navbar, notification count, report button and other shared parts
+  server/         Express API
+    src/routes/       one file per part of the API
+    src/schema.sql    database tables
+    src/seed.js       demo data
+    src/backup.js     daily database backup
+    tests/            API tests
 ```
-
-## Sprints
-
-| Sprint | Focus | Status |
-|---|---|---|
-| 1 | Planning and design (SRS and UML diagrams) | Done |
-| 2 | Core platform: accounts, profiles, matching, connections, teams | Done |
-| 3 | Projects and mentorship | Done |
-| 4 | Messaging, notifications and admin | Todo |
-| 5 | Testing, deployment and handover | Todo |

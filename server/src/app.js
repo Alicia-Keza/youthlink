@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -38,6 +39,20 @@ app.use('/api/messages', require('./routes/messages'));
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/reports', require('./routes/reports'));
 app.use('/api/admin', require('./routes/admin'));
+
+// In production the same server also sends the React pages built in client/dist
+if (config.isProduction) {
+  const clientFolder = path.join(__dirname, '..', '..', 'client', 'dist');
+  app.use(express.static(clientFolder));
+
+  // React decides which page to show, so every other page address gets index.html
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api/') || req.path.startsWith('/socket.io/')) {
+      return next();
+    }
+    res.sendFile(path.join(clientFolder, 'index.html'));
+  });
+}
 
 // Any other route
 app.use((req, res) => {

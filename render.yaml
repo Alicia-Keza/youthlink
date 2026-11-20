@@ -1,0 +1,24 @@
+# Settings for deploying YouthLink on Render (https://render.com) with the free plan.
+# Render reads this file when you create a new Blueprint from this repository.
+services:
+  - type: web
+    name: youthlink
+    runtime: node
+    plan: free
+    # Installs the server and client and builds the React pages into client/dist
+    buildCommand: npm run build
+    # Starts the Express server, which serves both the API and the React pages
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      # Render creates a random secret for signing login tokens
+      - key: JWT_SECRET
+        generateValue: true
+      # The free plan has no permanent disk, so the database is empty after every
+      # restart. This fills in the demo accounts again each time.
+      - key: SEED_IF_EMPTY
+        value: "true"

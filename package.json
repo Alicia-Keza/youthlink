@@ -1,0 +1,13 @@
+{
+  "name": "youthlink",
+  "version": "1.0.0",
+  "description": "A platform to transform ideas into real businesses through the collaboration of youth with different skills",
+  "private": true,
+  "scripts": {
+    "build": "npm install --prefix server && npm install --include=dev --prefix client && npm run build --prefix client",
+    "start": "npm start --prefix server"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
