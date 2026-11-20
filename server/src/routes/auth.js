@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const db = require('../db');
 const config = require('../config');
 const requireAuth = require('../middleware/auth');
+const { loginLimiter, registerLimiter } = require('../middleware/rateLimit');
 
 const router = express.Router();
 
@@ -14,7 +15,7 @@ function createToken(user) {
   return jwt.sign({ id: user.id, role: user.role }, config.jwtSecret, { expiresIn: '7d' });
 }
 
-router.post('/register', (req, res) => {
+router.post('/register', registerLimiter, (req, res) => {
   const { name, email, password, role, consent } = req.body;
 
   if (!name || !email || !password) {
@@ -50,7 +51,7 @@ router.post('/register', (req, res) => {
   res.status(201).json({ token: createToken(user), user });
 });
 
-router.post('/login', (req, res) => {
+router.post('/login', loginLimiter, (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
