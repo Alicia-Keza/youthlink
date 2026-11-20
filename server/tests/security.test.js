@@ -28,3 +28,30 @@ describe('Login rate limiting (NFR1)', () => {
     expect(blocked.body.error).toMatch(/Too many failed login attempts/);
   });
 });
+
+describe('Security headers and request checks (NFR1)', () => {
+  test('responses include security headers', async () => {
+    const res = await request(app).get('/api/health');
+
+    expect(res.headers['x-content-type-options']).toBe('nosniff');
+    expect(res.headers['x-frame-options']).toBe('SAMEORIGIN');
+    expect(res.headers['x-powered-by']).toBeUndefined();
+  });
+
+  test('broken JSON gets a clear error instead of a server error', async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .set('Content-Type', 'application/json')
+      .send('{"email": ');
+
+    expect(res.status).toBe(400);
+  });
+
+  test('a request that is too large is refused', async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'big@example.com', password: 'a'.repeat(200 * 1024) });
+
+    expect(res.status).toBe(413);
+  });
+});
