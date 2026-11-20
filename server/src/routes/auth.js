@@ -62,6 +62,9 @@ router.post('/login', (req, res) => {
   if (!user || !bcrypt.compareSync(password, user.password_hash)) {
     return res.status(401).json({ error: 'Incorrect email or password' });
   }
+  if (user.suspended_at) {
+    return res.status(403).json({ error: 'Your account has been suspended. Please contact YouthLink support.' });
+  }
 
   res.json({
     token: createToken(user),

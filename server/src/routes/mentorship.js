@@ -11,7 +11,7 @@ router.use(requireAuth);
 // Lists all mentors so a team can choose who to ask
 router.get('/mentors', (req, res) => {
   const mentors = db
-    .prepare("SELECT id FROM users WHERE role = 'mentor' ORDER BY name")
+    .prepare("SELECT id FROM users WHERE role = 'mentor' AND suspended_at IS NULL ORDER BY name")
     .all()
     .map((row) => getProfile(row.id));
 

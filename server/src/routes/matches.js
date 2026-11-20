@@ -11,7 +11,7 @@ const router = express.Router();
 router.get('/', requireAuth, (req, res) => {
   const me = getProfile(req.user.id);
   const others = db
-    .prepare("SELECT id FROM users WHERE role = 'youth' AND id != ?")
+    .prepare("SELECT id FROM users WHERE role = 'youth' AND id != ? AND suspended_at IS NULL")
     .all(req.user.id)
     .map((row) => getProfile(row.id));
 

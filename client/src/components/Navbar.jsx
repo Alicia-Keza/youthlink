@@ -25,6 +25,7 @@ export default function Navbar() {
             <NavLink to="/messages">Messages</NavLink>
             <NotificationBell />
             {user.role === 'mentor' && <NavLink to="/mentoring">Mentoring</NavLink>}
+            {user.role === 'admin' && <NavLink to="/admin">Admin</NavLink>}
             <NavLink to="/profile">Profile</NavLink>
             <button className="link-button" onClick={handleLogout}>Log out</button>
           </>

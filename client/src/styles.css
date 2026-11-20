@@ -491,6 +491,35 @@ fieldset {
   color: var(--primary);
 }
 
+/* Users table on the admin dashboard */
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.table th,
+.table td {
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* Report link and form */
+.report-link {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.report-form {
+  margin-top: 0.5rem;
+}
+
 /* Small screens */
 @media (max-width: 600px) {
   .chat-layout {
