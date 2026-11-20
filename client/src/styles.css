@@ -520,6 +520,35 @@ fieldset {
   margin-top: 0.5rem;
 }
 
+/* Help page */
+.help-contents ol,
+.card ol {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.card ol li {
+  margin-bottom: 0.35rem;
+}
+
+.faq {
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.faq:last-child {
+  border-bottom: none;
+}
+
+.faq summary {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.faq p {
+  margin: 0.5rem 0 0;
+}
+
 /* Small screens */
 @media (max-width: 600px) {
   .chat-layout {
