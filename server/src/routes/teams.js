@@ -5,6 +5,7 @@ const { areConnected } = require('../connectionHelpers');
 const { getSkills } = require('../profiles');
 const { isMember } = require('../teamHelpers');
 const notify = require('../notify');
+const { checkLengths } = require('../validation');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -35,6 +36,13 @@ router.post('/', (req, res) => {
 
   if (!name) {
     return res.status(400).json({ error: 'Team name is required' });
+  }
+  const lengthError = checkLengths([
+    [name, 100, 'Team name'],
+    [description, 1000, 'Description'],
+  ]);
+  if (lengthError) {
+    return res.status(400).json({ error: lengthError });
   }
   if (!Array.isArray(memberIds) || memberIds.length === 0) {
     return res.status(400).json({ error: 'Choose at least one connection to form a team' });
