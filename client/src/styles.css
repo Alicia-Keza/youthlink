@@ -18,6 +18,9 @@ body {
   color: var(--text);
   background: var(--background);
   line-height: 1.5;
+  /* A long link or word in a bio or project description should break
+     instead of making the page wider than a phone screen */
+  overflow-wrap: break-word;
 }
 
 h1 {
