@@ -13,5 +13,6 @@ module.exports = {
   isProduction,
   port: process.env.PORT || 4000,
   dbFile: process.env.DB_FILE || path.join(__dirname, '..', 'youthlink.db'),
+  backupDir: process.env.BACKUP_DIR || path.join(__dirname, '..', 'backups'),
   jwtSecret: process.env.JWT_SECRET || 'dev-secret-change-in-production',
 };
