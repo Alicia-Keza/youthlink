@@ -51,7 +51,18 @@ The project follows the Agile model and was built in short sprints. Each sprint 
 | 2 | Core platform: accounts, profiles, matching, connections, teams | Done |
 | 3 | Projects and mentorship | Done |
 | 4 | Messaging, notifications and admin | Done |
-| 5 | Security, backups, deployment, testing and handover | In progress |
+| 5 | Security, backups, deployment, testing and handover | Done |
+
+The original plan was to host on Railway. It was moved to Render because Render has a free plan.
+
+## Performance and devices
+
+These checks were done on the live site in Sprint 5:
+
+- Pages load in about 0.55 seconds on a normal visit, within the 3 second target (NFR2)
+- The app's code is about 80 KB when compressed, and the browser keeps it, so repeat visits are faster
+- The layout fits phone screens: the navbar wraps, long words break, the admin table scrolls sideways and the messages page shows one column (NFR4, NFR6)
+- The site is built for current versions of Chrome, Edge, Firefox and Safari
 
 ## Run it on your computer
 
