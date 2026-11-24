@@ -43,6 +43,10 @@ app.use('/api/admin', require('./routes/admin'));
 // In production the same server also sends the React pages built in client/dist
 if (config.isProduction) {
   const clientFolder = path.join(__dirname, '..', '..', 'client', 'dist');
+
+  // Files in assets/ have a new name every build, so the browser can keep them
+  // for a year instead of asking for them again on every visit
+  app.use('/assets', express.static(path.join(clientFolder, 'assets'), { maxAge: '1y', immutable: true }));
   app.use(express.static(clientFolder));
 
   // React decides which page to show, so every other page address gets index.html

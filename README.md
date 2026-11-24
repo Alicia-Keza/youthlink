@@ -2,7 +2,9 @@
 
 A platform to transform ideas into real businesses through the collaboration of youth with different skills.
 
-**Live demo:** the link will be added here after deployment.
+**Live demo:** https://youthlink-6wve.onrender.com
+
+The live site runs on a free plan, so the first visit after a quiet period can take up to a minute to open. The demo accounts listed below work there too.
 
 ## About
 

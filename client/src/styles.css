@@ -18,6 +18,9 @@ body {
   color: var(--text);
   background: var(--background);
   line-height: 1.5;
+  /* A long link or word in a bio or project description should break
+     instead of making the page wider than a phone screen */
+  overflow-wrap: break-word;
 }
 
 h1 {
@@ -564,7 +567,13 @@ fieldset {
   }
 
   .navbar nav {
-    gap: 0.75rem;
+    gap: 0.25rem 0.75rem;
     font-size: 0.95rem;
+  }
+
+  /* Bigger area around each link so it is easier to tap with a finger */
+  .navbar nav a {
+    display: inline-block;
+    padding: 0.35rem 0;
   }
 }
